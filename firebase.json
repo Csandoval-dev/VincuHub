@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/vincuhub",
+    "public": "dist/vincuhub/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
