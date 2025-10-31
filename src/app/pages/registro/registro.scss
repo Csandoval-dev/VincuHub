@@ -1,86 +1,169 @@
-// Variables
+// ==========================================
+// VARIABLES Y CONFIGURACIÓN
+// ==========================================
 $primary-color: #6366f1;
 $secondary-color: #8b5cf6;
-$gradient: linear-gradient(135deg, $primary-color, $secondary-color);
+$text-dark: #1e293b;
+$text-medium: #475569;
+$text-light: #64748b;
+$border-color: #e2e8f0;
+$bg-light: #fafafa;
 
-.registro-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+$gradient: linear-gradient(135deg, $primary-color, $secondary-color);
+$gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+// Espaciado
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Bordes
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 20px;
+
+// Breakpoints
+$breakpoint-tablet: 968px;
+$breakpoint-mobile: 640px;
+$breakpoint-small: 480px;
+
+// Mixins
+@mixin transition($property: all) {
+  transition: $property 0.3s ease;
 }
 
-.registro-container {
-  max-width: 1200px;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
+@mixin shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+@mixin shadow-md {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+@mixin shadow-lg {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-// Header
-.registro-header {
-  grid-column: 1 / -1;
-  padding: 1.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e2e8f0;
-
-  .back-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #64748b;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-
-    .arrow {
-      font-size: 1.5rem;
-    }
-
-    &:hover {
-      color: $primary-color;
-    }
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    .logo-icon {
-      font-size: 1.8rem;
-    }
-
-    .logo-text {
-      font-size: 1.3rem;
-      font-weight: 700;
-      background: $gradient;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-  }
-}
-
-// Image Side
-.registro-image {
-  background: $gradient;
-  padding: 3rem;
+// ==========================================
+// LAYOUT PRINCIPAL
+// ==========================================
+.registro-page {
+  min-height: 100vh;
+  background: $gradient-bg;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  padding: $spacing-lg;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: $spacing-sm;
+  }
+}
+
+.registro-container {
+  width: 100%;
+  max-width: 1200px;
+  background: white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  @include shadow-lg;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "header header"
+    "image form";
+
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "image"
+      "form";
+  }
+}
+
+// ==========================================
+// HEADER (Logo y navegación)
+// ==========================================
+.registro-header {
+  grid-area: header;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $border-color;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+
+  @media (max-width: $breakpoint-small) {
+    flex-direction: column;
+    padding: $spacing-md;
+  }
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  
+  color: $text-light;
+  font-weight: 600;
+  text-decoration: none;
+  @include transition;
+
+  .arrow {
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    color: $primary-color;
+  }
+
+  @media (max-width: $breakpoint-small) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .logo-icon {
+    font-size: 1.8rem;
+  }
+
+  .logo-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: $gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+// ==========================================
+// SECCIÓN DE IMAGEN
+// ==========================================
+.registro-image {
+  grid-area: image;
   position: relative;
+  padding: $spacing-xl;
+  
+  background: $gradient;
+  color: white;
   overflow: hidden;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Efecto de fondo animado
   &::before {
     content: '';
     position: absolute;
@@ -92,326 +175,351 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
     animation: rotate 20s linear infinite;
   }
 
-  .image-content {
-    position: relative;
-    z-index: 1;
+  @media (max-width: $breakpoint-tablet) {
+    padding: $spacing-lg;
+  }
+}
 
-    h2 {
+.image-content {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: $spacing-sm;
+    line-height: 1.2;
+
+    @media (max-width: $breakpoint-tablet) {
+      font-size: 1.8rem;
+    }
+  }
+
+  p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: $spacing-xl;
+    line-height: 1.6;
+
+    @media (max-width: $breakpoint-tablet) {
+      margin-bottom: $spacing-md;
+    }
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
+
+    @media (max-width: $breakpoint-tablet) {
+      gap: $spacing-sm;
+    }
+
+    @media (max-width: $breakpoint-small) {
+      gap: $spacing-xs;
+    }
+  }
+
+  .stat {
+    text-align: center;
+
+    h3 {
       font-size: 2.5rem;
       font-weight: 800;
-      margin-bottom: 1rem;
-      line-height: 1.2;
+      margin-bottom: 0.3rem;
+
+      @media (max-width: $breakpoint-tablet) {
+        font-size: 1.8rem;
+      }
+
+      @media (max-width: $breakpoint-small) {
+        font-size: 1.5rem;
+      }
     }
 
     p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-      margin-bottom: 3rem;
-      line-height: 1.6;
-    }
+      font-size: 0.95rem;
+      opacity: 0.8;
+      margin: 0;
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-
-      .stat {
-        text-align: center;
-
-        h3 {
-          font-size: 2.5rem;
-          font-weight: 800;
-          margin-bottom: 0.3rem;
-        }
-
-        p {
-          font-size: 0.95rem;
-          opacity: 0.8;
-          margin: 0;
-        }
+      @media (max-width: $breakpoint-small) {
+        font-size: 0.8rem;
       }
     }
   }
 }
 
-// Card
+// ==========================================
+// CARD DEL FORMULARIO
+// ==========================================
 .registro-card {
-  padding: 3rem;
+  grid-area: form;
+  padding: $spacing-xl;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  .card-header {
-    margin-bottom: 2rem;
+  @media (max-width: $breakpoint-tablet) {
+    padding: $spacing-lg;
+  }
 
-    .title {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #1e293b;
-      margin-bottom: 0.5rem;
-    }
-
-    .subtitle {
-      color: #64748b;
-      font-size: 1rem;
-    }
+  @media (max-width: $breakpoint-small) {
+    padding: $spacing-md;
   }
 }
 
-// Form
-.registro-form {
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
+.card-header {
+  margin-bottom: $spacing-lg;
 
-  .form-group {
-    margin-bottom: 1.5rem;
+  .title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: $text-dark;
+    margin-bottom: $spacing-xs;
+    line-height: 1.2;
 
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #475569;
-      font-size: 0.9rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-      }
-    }
-
-    select.form-control {
-      cursor: pointer;
+    @media (max-width: $breakpoint-small) {
+      font-size: 1.5rem;
     }
   }
 
-  .checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #64748b;
-    margin-bottom: 1.5rem;
-
-    input[type="checkbox"] {
-      cursor: pointer;
-      width: 16px;
-      height: 16px;
-    }
-
-    a {
-      color: $primary-color;
-      text-decoration: none;
-      font-weight: 600;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .btn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
+  .subtitle {
     font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    color: $text-light;
 
-    &.btn-primary {
-      background: $gradient;
-      color: white;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
-      }
-    }
-
-    &.btn-block {
-      width: 100%;
-      padding: 1rem;
-    }
-
-    &.btn-social {
-      background: white;
-      border: 2px solid #e2e8f0;
-      color: #64748b;
-
-      &:hover {
-        border-color: $primary-color;
-        color: $primary-color;
-        transform: translateY(-2px);
-      }
-    }
-  }
-
-  .divider {
-    position: relative;
-    text-align: center;
-    margin: 1.5rem 0;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: #e2e8f0;
-    }
-
-    span {
-      position: relative;
-      background: white;
-      padding: 0 1rem;
-      color: #94a3b8;
+    @media (max-width: $breakpoint-small) {
       font-size: 0.9rem;
-    }
-  }
-
-  .social-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-
-    .icon-google::before {
-      content: "G";
-      font-weight: 700;
-      color: #ea4335;
-    }
-
-    .icon-microsoft::before {
-      content: "M";
-      font-weight: 700;
-      color: #00a4ef;
-    }
-  }
-
-  .login-link {
-    text-align: center;
-    color: #64748b;
-    font-size: 0.95rem;
-
-    a {
-      color: $primary-color;
-      text-decoration: none;
-      font-weight: 600;
-
-      &:hover {
-        text-decoration: underline;
-      }
     }
   }
 }
 
+// ==========================================
+// FORMULARIO
+// ==========================================
+.registro-form {
+  width: 100%;
+}
+
+// Form Row (para campos en fila)
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+
+  @media (max-width: $breakpoint-tablet) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Form Groups
+.form-group {
+  margin-bottom: $spacing-md;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-medium;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.8rem $spacing-sm;
+    
+    font-size: 1rem;
+    border: 2px solid $border-color;
+    border-radius: $radius-sm;
+    box-sizing: border-box;
+    @include transition;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+  }
+
+  select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-sm center;
+    padding-right: 2.5rem;
+  }
+}
+
+// Checkbox con términos
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-xs;
+  
+  font-size: 0.9rem;
+  color: $text-light;
+  cursor: pointer;
+  margin-bottom: $spacing-md;
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  a {
+    color: $primary-color;
+    font-weight: 600;
+    text-decoration: none;
+    @include transition(color);
+
+    &:hover {
+      color: darken($primary-color, 10%);
+      text-decoration: underline;
+    }
+  }
+}
+
+// ==========================================
+// BOTONES
+// ==========================================
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  
+  padding: 0.8rem $spacing-md;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  @include transition;
+
+  &.btn-block {
+    width: 100%;
+    padding: $spacing-sm;
+  }
+
+  &.btn-primary {
+    background: $gradient;
+    color: white;
+
+    &:hover {
+      transform: translateY(-2px);
+      @include shadow-md;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &.btn-social {
+    background: white;
+    border: 2px solid $border-color;
+    color: $text-light;
+
+    &:hover {
+      border-color: $primary-color;
+      color: $primary-color;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// ==========================================
+// DIVIDER Y SOCIAL BUTTONS
+// ==========================================
+.divider {
+  position: relative;
+  text-align: center;
+  margin: $spacing-md 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: $border-color;
+  }
+
+  span {
+    position: relative;
+    display: inline-block;
+    padding: 0 $spacing-sm;
+    
+    font-size: 0.9rem;
+    color: #94a3b8;
+    background: white;
+  }
+}
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+
+  @media (max-width: $breakpoint-small) {
+    grid-template-columns: 1fr;
+  }
+
+  .icon-google::before {
+    content: "G";
+    font-weight: 700;
+    color: #ea4335;
+  }
+
+  .icon-microsoft::before {
+    content: "M";
+    font-weight: 700;
+    color: #00a4ef;
+  }
+}
+
+.login-link {
+  text-align: center;
+  font-size: 0.95rem;
+  color: $text-light;
+
+  a {
+    font-weight: 600;
+    color: $primary-color;
+    text-decoration: none;
+    @include transition(color);
+
+    &:hover {
+      color: darken($primary-color, 10%);
+      text-decoration: underline;
+    }
+  }
+}
+
+// ==========================================
+// ANIMACIONES
+// ==========================================
 @keyframes rotate {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
-  }
-}
-
-// Responsive
-@media (max-width: 968px) {
-  .registro-container {
-    grid-template-columns: 1fr;
-  }
-
-  .registro-image {
-    order: -1;
-    padding: 2rem;
-
-    .image-content {
-      h2 {
-        font-size: 1.8rem;
-      }
-
-      p {
-        margin-bottom: 1.5rem;
-      }
-
-      .stats {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-
-        .stat h3 {
-          font-size: 1.8rem;
-        }
-      }
-    }
-  }
-
-  .registro-card {
-    padding: 2rem;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .registro-page {
-    padding: 1rem;
-  }
-
-  .registro-card {
-    padding: 1.5rem;
-
-    .card-header .title {
-      font-size: 1.5rem;
-    }
-  }
-
-  .social-buttons {
-    grid-template-columns: 1fr !important;
-  }
-
-  .registro-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-
-    .back-button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  .registro-image {
-    .image-content .stats {
-      gap: 0.5rem;
-
-      .stat h3 {
-        font-size: 1.5rem;
-      }
-
-      .stat p {
-        font-size: 0.8rem;
-      }
-    }
   }
 }
