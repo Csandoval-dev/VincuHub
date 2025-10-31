@@ -1,0 +1,106 @@
+<section class="hero-section" id="inicio">
+  <div class="hero-background">
+    <div class="hero-shape shape-1"></div>
+    <div class="hero-shape shape-2"></div>
+    <div class="hero-shape shape-3"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="hero-badge">
+          <span class="badge-dot"></span>
+          Plataforma de Gestión Académica
+        </span>
+        
+        <h1 class="hero-title">
+          Gestiona tus
+          <span class="gradient-text rotating-text">{{ displayText }}</span>
+          de manera eficiente
+        </h1>
+        
+        <p class="hero-description">
+          Plataforma integral para la organización y gestión de eventos académicos, 
+          proyectos de vinculación y actividades universitarias. Conecta tu institución 
+          con el futuro de la educación.
+        </p>
+
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-large">
+            <span>Comenzar Ahora</span>
+            <i class="icon-arrow">→</i>
+          </button>
+          <button class="btn btn-outline btn-large" (click)="scrollToSection('eventos')">
+            <i class="icon-play">▶</i>
+            <span>Ver Demo</span>
+          </button>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-item">
+            <i class="feature-icon">✓</i>
+            <span>Registro fácil</span>
+          </div>
+          <div class="feature-item">
+            <i class="feature-icon">✓</i>
+            <span>Gestión en tiempo real</span>
+          </div>
+          <div class="feature-item">
+            <i class="feature-icon">✓</i>
+            <span>Reportes automáticos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <div class="image-container">
+          <div class="floating-card card-1">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <p class="card-title">Análisis en Tiempo Real</p>
+              <p class="card-value">+45%</p>
+            </div>
+          </div>
+
+          <div class="floating-card card-2">
+            <div class="card-icon">👥</div>
+            <div class="card-content">
+              <p class="card-title">Participantes</p>
+              <p class="card-value">1,234</p>
+            </div>
+          </div>
+
+          <div class="floating-card card-3">
+            <div class="card-icon">✅</div>
+            <div class="card-content">
+              <p class="card-title">Proyectos Activos</p>
+              <p class="card-value">89</p>
+            </div>
+          </div>
+
+          <div class="hero-main-image">
+            <div class="image-placeholder">
+              <i class="placeholder-icon">🎓</i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="hero-stats">
+      <div class="stat-item" *ngFor="let stat of stats">
+        <h3 class="stat-number">{{ stat.number }}</h3>
+        <p class="stat-label">{{ stat.label }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="scroll-indicator">
+    <div class="mouse">
+      <div class="wheel"></div>
+    </div>
+    <p>Desliza para explorar</p>
+  </div>
+</section>

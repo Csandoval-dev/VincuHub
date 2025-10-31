@@ -1,0 +1,95 @@
+<section class="carousel-section" id="eventos">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <span class="section-badge">Eventos Destacados</span>
+      <h2 class="section-title">Próximos Eventos y Proyectos</h2>
+      <p class="section-description">
+        Descubre las oportunidades académicas y de vinculación que tenemos preparadas para ti
+      </p>
+    </div>
+
+    <!-- Carousel Container -->
+    <div class="carousel-container">
+      <!-- Navigation Buttons -->
+      <button class="carousel-nav prev" (click)="prevSlide(); stopAutoSlide(); startAutoSlide()">
+        <i class="nav-icon">‹</i>
+      </button>
+      
+      <button class="carousel-nav next" (click)="nextSlide(); stopAutoSlide(); startAutoSlide()">
+        <i class="nav-icon">›</i>
+      </button>
+
+      <!-- Carousel Track -->
+      <div class="carousel-track">
+        <div class="carousel-cards" [style.transform]="'translateX(-' + (currentIndex * 340) + 'px)'">
+          <div class="event-card" *ngFor="let event of events; let i = index">
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="card-image">
+                <span class="event-emoji">{{ event.image }}</span>
+                <span class="card-category">{{ event.category }}</span>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+              <div class="card-university">
+                <i class="uni-icon">🎓</i>
+                {{ event.university }}
+              </div>
+              
+              <h3 class="card-title">{{ event.title }}</h3>
+              
+              <p class="card-description">{{ event.description }}</p>
+
+              <div class="card-info">
+                <div class="info-item">
+                  <i class="info-icon">📅</i>
+                  <span>{{ event.date }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="info-icon">📍</i>
+                  <span>{{ event.location }}</span>
+                </div>
+                <div class="info-item">
+                  <i class="info-icon">👥</i>
+                  <span>{{ event.attendees }} inscritos</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer">
+              <button class="btn btn-card">
+                Ver Detalles
+                <i class="arrow-icon">→</i>
+              </button>
+              <button class="btn btn-icon">
+                <i>❤️</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dots Indicator -->
+      <div class="carousel-dots">
+        <button 
+          *ngFor="let event of events; let i = index" 
+          class="dot" 
+          [class.active]="i === currentIndex"
+          (click)="goToSlide(i)">
+        </button>
+      </div>
+    </div>
+
+    <!-- View All Button -->
+    <div class="carousel-footer">
+      <button class="btn btn-outline-large">
+        Ver Todos los Eventos
+        <i class="icon">→</i>
+      </button>
+    </div>
+  </div>
+</section>

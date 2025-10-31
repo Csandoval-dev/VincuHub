@@ -1,0 +1,417 @@
+// Variables
+$primary-color: #6366f1;
+$secondary-color: #8b5cf6;
+$gradient: linear-gradient(135deg, $primary-color, $secondary-color);
+
+.registro-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.registro-container {
+  max-width: 1200px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+// Header
+.registro-header {
+  grid-column: 1 / -1;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+
+    .arrow {
+      font-size: 1.5rem;
+    }
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .logo-icon {
+      font-size: 1.8rem;
+    }
+
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: $gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+// Image Side
+.registro-image {
+  background: $gradient;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+  }
+
+  .image-content {
+    position: relative;
+    z-index: 1;
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 3rem;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+
+      .stat {
+        text-align: center;
+
+        h3 {
+          font-size: 2.5rem;
+          font-weight: 800;
+          margin-bottom: 0.3rem;
+        }
+
+        p {
+          font-size: 0.95rem;
+          opacity: 0.8;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+// Card
+.registro-card {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .card-header {
+    margin-bottom: 2rem;
+
+    .title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Form
+.registro-form {
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+
+    input[type="checkbox"] {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    &.btn-primary {
+      background: $gradient;
+      color: white;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+      }
+    }
+
+    &.btn-block {
+      width: 100%;
+      padding: 1rem;
+    }
+
+    &.btn-social {
+      background: white;
+      border: 2px solid #e2e8f0;
+      color: #64748b;
+
+      &:hover {
+        border-color: $primary-color;
+        color: $primary-color;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  .divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    span {
+      position: relative;
+      background: white;
+      padding: 0 1rem;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+  }
+
+  .social-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .icon-google::before {
+      content: "G";
+      font-weight: 700;
+      color: #ea4335;
+    }
+
+    .icon-microsoft::before {
+      content: "M";
+      font-weight: 700;
+      color: #00a4ef;
+    }
+  }
+
+  .login-link {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive
+@media (max-width: 968px) {
+  .registro-container {
+    grid-template-columns: 1fr;
+  }
+
+  .registro-image {
+    order: -1;
+    padding: 2rem;
+
+    .image-content {
+      h2 {
+        font-size: 1.8rem;
+      }
+
+      p {
+        margin-bottom: 1.5rem;
+      }
+
+      .stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+
+        .stat h3 {
+          font-size: 1.8rem;
+        }
+      }
+    }
+  }
+
+  .registro-card {
+    padding: 2rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .registro-page {
+    padding: 1rem;
+  }
+
+  .registro-card {
+    padding: 1.5rem;
+
+    .card-header .title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .social-buttons {
+    grid-template-columns: 1fr !important;
+  }
+
+  .registro-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+
+    .back-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .registro-image {
+    .image-content .stats {
+      gap: 0.5rem;
+
+      .stat h3 {
+        font-size: 1.5rem;
+      }
+
+      .stat p {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}

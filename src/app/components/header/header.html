@@ -1,0 +1,35 @@
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo" routerLink="/inicio" style="cursor: pointer;">
+        <i class="icon-graduation"></i>
+        <span class="logo-text">Vincu Hub</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="nav" [class.active]="isMenuOpen">
+        <a routerLink="/inicio" class="nav-link">Inicio</a>
+        <a href="#eventos" class="nav-link" (click)="scrollToSection('eventos')">Eventos</a>
+        <a href="#contacto" class="nav-link" (click)="scrollToSection('contacto')">Contacto</a>
+      </nav>
+
+      <!-- Auth Buttons -->
+      <div class="auth-buttons">
+        <button class="btn btn-outline" routerLink="/login">
+          Iniciar Sesión
+        </button>
+        <button class="btn btn-primary" routerLink="/registro">
+          Registrarse
+        </button>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle" (click)="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>

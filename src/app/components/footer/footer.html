@@ -1,0 +1,112 @@
+<footer class="footer" id="contacto">
+  <!-- Main Footer -->
+  <div class="footer-main">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <!-- Company Info -->
+        <div class="footer-col footer-about">
+          <div class="footer-logo">
+            <i class="logo-icon">🎓</i>
+            <span class="logo-text">UniEventos</span>
+          </div>
+          <p class="footer-description">
+            Plataforma integral para la gestión de eventos académicos, proyectos de 
+            vinculación y actividades universitarias en Honduras.
+          </p>
+          
+          <!-- Social Links -->
+          <div class="social-links">
+            <a 
+              *ngFor="let social of socialLinks" 
+              [href]="social.url" 
+              class="social-link"
+              [attr.aria-label]="social.name"
+              [title]="social.name">
+              <span class="social-icon">{{ social.icon }}</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="footer-col">
+          <h4 class="footer-title">Navegación</h4>
+          <ul class="footer-links">
+            <li *ngFor="let link of navigationLinks">
+              <a [href]="link.url" class="footer-link">{{ link.label }}</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="footer-col">
+          <h4 class="footer-title">Recursos</h4>
+          <ul class="footer-links">
+            <li *ngFor="let link of resourceLinks">
+              <a [href]="link.url" class="footer-link">{{ link.label }}</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="footer-col footer-newsletter">
+          <h4 class="footer-title">Mantente Informado</h4>
+          <p class="newsletter-text">
+            Suscríbete para recibir actualizaciones sobre nuevos eventos y proyectos.
+          </p>
+          <form class="newsletter-form" (submit)="onSubscribe(); $event.preventDefault()">
+            <div class="input-group">
+              <input 
+                type="email" 
+                class="newsletter-input" 
+                placeholder="tu@email.com"
+                [(ngModel)]="subscribeEmail"
+                name="email"
+                required>
+              <button type="submit" class="newsletter-button">
+                <span class="btn-text">Suscribirse</span>
+                <span class="btn-icon">→</span>
+              </button>
+            </div>
+          </form>
+          
+          <!-- Contact Info -->
+          <div class="contact-info">
+            <div class="contact-item">
+              <i class="contact-icon">📧</i>
+              <span>info@unieventos.hn</span>
+            </div>
+            <div class="contact-item">
+              <i class="contact-icon">📱</i>
+              <span>+504 2222-3333</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Bottom -->
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-content">
+        <p class="copyright">
+          © {{ currentYear }} UniEventos. Todos los derechos reservados.
+        </p>
+        
+        <ul class="legal-links">
+          <li *ngFor="let link of legalLinks; let last = last">
+            <a [href]="link.url" class="legal-link">{{ link.label }}</a>
+            <span class="separator" *ngIf="!last">•</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" (click)="scrollToTop()" title="Volver arriba">
+    <i class="arrow-up">↑</i>
+  </button>
+</footer>
