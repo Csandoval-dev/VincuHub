@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  // Redirige a inicio en lugar de login
+  
   { path: '', redirectTo: 'inicio', pathMatch: 'full' },
   
   {
@@ -17,6 +17,4 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/registro/registro').then(m => m.Registro)
   },
   
-  // Ruta 404
-  { path: '**', redirectTo: 'inicio' }
 ];
