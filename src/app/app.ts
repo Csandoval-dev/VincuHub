@@ -5,7 +5,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   selector: 'app-root',
   imports: [RouterOutlet, RouterLink],
   templateUrl: './app.html',
-  styleUrls: ['./app.scss']  // ← aquí el archivo correcto
+  styleUrls: ['./app.scss']  
 })
 export class App {
   protected readonly title = signal('vincuhub');

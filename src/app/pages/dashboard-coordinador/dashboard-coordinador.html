@@ -1,0 +1,63 @@
+<!-- src/app/pages/dashboard-coordinador/dashboard-coordinador.component.html -->
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Dashboard Coordinador</h1>
+      <div class="user-info">
+        <span>{{ currentUser?.nombre }}</span>
+        <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="welcome-section">
+      <h2>Panel de Coordinación - {{ currentUser?.nombre }}</h2>
+      <p><strong>Rol:</strong> Coordinador de Carrera</p>
+      <p><strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Eventos Creados</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">eventos totales</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Estudiantes Inscritos</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">en mis eventos</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Eventos Activos</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">próximamente</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Horas Certificadas</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">este mes</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Gestión de Eventos</h3>
+      <div class="actions-grid">
+        <button class="action-btn primary">➕ Crear Nuevo Evento</button>
+        <button class="action-btn">📋 Mis Eventos</button>
+        <button class="action-btn">✅ Validar Asistencias</button>
+        <button class="action-btn">📊 Reportes</button>
+        <button class="action-btn">👥 Ver Estudiantes Inscritos</button>
+        <button class="action-btn">💬 Moderar Foros</button>
+      </div>
+    </div>
+  </main>
+</div>

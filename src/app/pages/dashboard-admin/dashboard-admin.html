@@ -1,0 +1,145 @@
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Dashboard Administrador</h1>
+      <div class="user-info">
+        <span>{{ currentUser?.nombre }}</span>
+        <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="welcome-section">
+      <h2>Panel de Administración - {{ currentUser?.nombre }}</h2>
+      <p>Control total del sistema VincuHub</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Usuarios</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">en el sistema</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Eventos Totales</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">todos los campus</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Coordinadores</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">activos</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Estudiantes</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">registrados</span>
+      </div>
+    </div>
+
+    <!-- Create User Section -->
+    <div class="create-user-section">
+      <h3>Crear Nuevo Usuario (Coordinador/Admin)</h3>
+      <p class="info-text">Los estudiantes se registran desde la página pública de registro</p>
+      
+      <form (ngSubmit)="createUser()" class="user-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="newUser.nombre" 
+              name="nombre" 
+              placeholder="Ej: Juan"
+              required>
+          </div>
+          
+          <div class="form-group">
+            <label>Apellido</label>
+            <input 
+              type="text" 
+              [(ngModel)]="newUser.apellido" 
+              name="apellido"
+              placeholder="Ej: Pérez">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Correo Electrónico *</label>
+            <input 
+              type="email" 
+              [(ngModel)]="newUser.correo" 
+              name="correo" 
+              placeholder="ejemplo@ceutec.edu"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label>Contraseña *</label>
+            <input 
+              type="password" 
+              [(ngModel)]="newUser.password" 
+              name="password" 
+              placeholder="Mínimo 6 caracteres"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Rol *</label>
+            <select [(ngModel)]="newUser.rol" name="rol" required>
+              <option value="">Seleccionar rol</option>
+              <option value="coordinador">Coordinador</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Campus</label>
+            <input 
+              type="text" 
+              [(ngModel)]="newUser.campus" 
+              name="campus" 
+              placeholder="Ej: Tegucigalpa">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-create" [disabled]="loading">
+            {{ loading ? 'Creando...' : '➕ Crear Usuario' }}
+          </button>
+          <button type="button" (click)="resetForm()" class="btn-cancel">
+            Limpiar
+          </button>
+        </div>
+
+        <div *ngIf="message" class="message" [class.error]="isError">
+          {{ message }}
+        </div>
+      </form>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Gestión del Sistema</h3>
+      <div class="actions-grid">
+        <button class="action-btn">👥 Ver Todos los Usuarios</button>
+        <button class="action-btn">📅 Gestionar Eventos</button>
+        <button class="action-btn">📊 Reportes Generales</button>
+        <button class="action-btn">⚙️ Configuración</button>
+        <button class="action-btn">🎓 Gestionar Carreras</button>
+        <button class="action-btn">🏢 Gestionar Campus</button>
+      </div>
+    </div>
+  </main>
+</div>

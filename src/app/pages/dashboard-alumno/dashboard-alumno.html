@@ -1,0 +1,54 @@
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Dashboard Estudiante</h1>
+      <div class="user-info">
+        <span>{{ currentUser?.nombre }}</span>
+        <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="welcome-section">
+      <h2>¡Bienvenido, {{ currentUser?.nombre }}!</h2>
+      <p><strong>Carrera:</strong> {{ currentUser?.carrera || 'No especificada' }}</p>
+      <p><strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Horas de Vinculación</h3>
+        <p class="stat-number">{{ currentUser?.horasVinculacionTotal || 0 }}</p>
+        <span class="stat-label">horas completadas</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Eventos Inscritos</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">eventos activos</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Eventos Completados</h3>
+        <p class="stat-number">0</p>
+        <span class="stat-label">este semestre</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h3>Acciones Rápidas</h3>
+      <div class="actions-grid">
+        <button class="action-btn">📅 Ver Eventos Disponibles</button>
+        <button class="action-btn">📝 Mis Inscripciones</button>
+        <button class="action-btn">💬 Foros de Discusión</button>
+        <button class="action-btn">📊 Mi Historial</button>
+      </div>
+    </div>
+  </main>
+</div>
