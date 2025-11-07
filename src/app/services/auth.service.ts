@@ -17,6 +17,10 @@ import {
   setDoc, 
   getDoc,
   docData,
+   query,           // ⬅️ AGREGAR
+  where,           // ⬅️ AGREGAR
+  getDocs,         // ⬅️ AGREGAR
+  deleteDoc,
   collection,
   collectionData
 } from '@angular/fire/firestore';
@@ -137,41 +141,70 @@ export class AuthService {
   }
 
   // Login con email y password
-  login(email: string, password: string): Observable<User> {
-    console.log('🔐 Intentando login con:', email);
+ login(email: string, password: string): Observable<User> {
+    console.log('🔐 Login:', email);
     
     return from(
       (async () => {
         try {
-          // 1. Autenticar
-          console.log('🔑 Paso 1: Autenticando...');
-          const credential = await signInWithEmailAndPassword(this.auth, email, password);
-          console.log('✅ Autenticación exitosa, UID:', credential.user.uid);
+          // Buscar usuario en Firestore primero
+          const usersRef = collection(this.firestore, 'users');
+          const q = query(usersRef, where('correo', '==', email));
+          const querySnapshot = await getDocs(q);
           
-          // 2. Obtener datos de Firestore
-          console.log('📄 Paso 2: Obteniendo datos de Firestore...');
-          const userDocRef = doc(this.firestore, `users/${credential.user.uid}`);
-          const userDoc = await getDoc(userDocRef);
-          
-          if (!userDoc.exists()) {
-            console.error('❌ Usuario no encontrado en Firestore');
-            throw new Error('Usuario no encontrado en la base de datos');
+          if (querySnapshot.empty) {
+            throw new Error('Usuario no encontrado');
           }
           
-          const userData = userDoc.data() as User;
-          console.log('✅ Datos del usuario obtenidos:', userData);
+          const userData = querySnapshot.docs[0].data() as User;
           
-          return userData;
+          // Si es primer login (creado por admin)
+          if (userData.needsFirstLogin && userData.tempPassword === password) {
+            console.log('🆕 Primer login - Creando cuenta en Authentication...');
+            
+            // Crear en Authentication
+            const credential = await createUserWithEmailAndPassword(
+              this.auth,
+              email,
+              password
+            );
+            
+            // Actualizar Firestore con nuevo UID
+            const oldDocRef = doc(this.firestore, `users/${userData.uid}`);
+            const newDocRef = doc(this.firestore, `users/${credential.user.uid}`);
+            
+            const updatedUser = {
+              ...userData,
+              uid: credential.user.uid,
+              needsFirstLogin: false,
+              tempPassword: undefined,
+              updatedAt: new Date()
+            };
+            
+            await setDoc(newDocRef, updatedUser);
+            await deleteDoc(oldDocRef);
+            
+            console.log('✅ Cuenta activada');
+            return updatedUser;
+          }
+          
+          // Login normal
+          const credential = await signInWithEmailAndPassword(this.auth, email, password);
+          const userDoc = await getDoc(doc(this.firestore, `users/${credential.user.uid}`));
+          
+          if (!userDoc.exists()) {
+            throw new Error('Usuario no encontrado');
+          }
+          
+          return userDoc.data() as User;
           
         } catch (error: any) {
-          console.error('❌ Error durante el login:', error);
-          console.error('📋 Código de error:', error.code);
+          console.error('❌ Error login:', error);
           throw error;
         }
       })()
     );
   }
-
   // Login con Google
   loginWithGoogle(): Observable<User> {
     console.log('🔐 Iniciando login con Google...');

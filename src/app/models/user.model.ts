@@ -12,7 +12,10 @@ export interface User {
   horasVinculacionTotal: number;
   createdAt?: Date;
   updatedAt?: Date;
+tempPassword?: string;
+  needsFirstLogin?: boolean;
 }
+
 
 export interface CreateUserData {
   nombre: string;

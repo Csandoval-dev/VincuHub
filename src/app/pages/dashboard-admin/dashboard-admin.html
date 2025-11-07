@@ -3,57 +3,207 @@
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-content">
-      <h1>Dashboard Administrador</h1>
-      <div class="user-info">
-        <span>{{ currentUser?.nombre }}</span>
-        <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+      <div class="header-left">
+        <h1>Gestión de Usuarios</h1>
+        <p class="subtitle">Panel de Administración - VincuHub</p>
+      </div>
+      <div class="header-right">
+        <span class="user-name">{{ currentUser?.nombre }}</span>
+        <button (click)="logout()" class="btn-logout">
+          <span class="btn-text">Cerrar Sesión</span>
+        </button>
       </div>
     </div>
   </header>
 
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button 
+      class="nav-tab" 
+      [class.active]="currentView === 'users'"
+      (click)="changeView('users')">
+      <span class="tab-text">Lista de Usuarios</span>
+    </button>
+    <button 
+      class="nav-tab" 
+      [class.active]="currentView === 'create'"
+      (click)="changeView('create')">
+      <span class="tab-text">Crear Usuario</span>
+    </button>
+  </nav>
+
+  <!-- Messages -->
+  <div *ngIf="message" class="message-container" [class.error]="isError" [class.success]="!isError">
+    <div class="message-icon" [class.error]="isError"></div>
+    <span>{{ message }}</span>
+  </div>
+
   <!-- Main Content -->
   <main class="dashboard-main">
-    <div class="welcome-section">
-      <h2>Panel de Administración - {{ currentUser?.nombre }}</h2>
-      <p>Control total del sistema VincuHub</p>
+
+    <!-- ============================================ -->
+    <!-- VISTA: LISTA DE USUARIOS -->
+    <!-- ============================================ -->
+    <div *ngIf="currentView === 'users'" class="view-users">
+      <div class="users-header">
+        <h2>Usuarios Registrados</h2>
+        <button (click)="changeView('create')" class="btn-create-user">
+          Crear Nuevo Usuario
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <label>Buscar</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (ngModelChange)="onSearchChange()"
+            placeholder="Nombre, correo, carrera..." 
+            class="search-input">
+        </div>
+
+        <div class="filter-group">
+          <label>Filtrar por rol</label>
+          <select [(ngModel)]="filterRole" (ngModelChange)="onFilterRoleChange()" class="filter-select">
+            <option value="todos">Todos los roles</option>
+            <option value="estudiante">Estudiantes</option>
+            <option value="coordinador">Coordinadores</option>
+            <option value="admin">Administradores</option>
+          </select>
+        </div>
+
+        <div class="filter-results">
+          <span class="results-text">Mostrando {{ filteredUsers.length }} de {{ allUsers.length }} usuarios</span>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loadingUsers" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando usuarios...</p>
+      </div>
+
+      <!-- Users Cards (Mobile) -->
+      <div *ngIf="!loadingUsers && filteredUsers.length > 0" class="users-cards mobile-only">
+        <div *ngFor="let user of filteredUsers" class="user-card">
+          <div class="user-card-header">
+            <div class="user-info">
+              <div class="user-avatar">{{ user.nombre?.charAt(0) }}{{ user.apellido?.charAt(0) }}</div>
+              <div class="user-details">
+                <h3>{{ user.nombre }} {{ user.apellido }}</h3>
+                <p class="user-email">{{ user.correo }}</p>
+              </div>
+            </div>
+            <span class="badge" [class]="getRoleBadgeClass(user.rol)">
+              {{ getRoleLabel(user.rol) }}
+            </span>
+          </div>
+          
+          <div class="user-card-body">
+            <div class="info-row" *ngIf="user.carrera">
+              <span class="info-label">Carrera:</span>
+              <span class="info-value">{{ user.carrera }}</span>
+            </div>
+            <div class="info-row" *ngIf="user.campus">
+              <span class="info-label">Campus:</span>
+              <span class="info-value">{{ user.campus }}</span>
+            </div>
+          </div>
+
+          <div class="user-card-actions">
+            <button 
+              class="btn-action btn-edit" 
+              (click)="openEditUser(user)">
+              Editar
+            </button>
+            <button 
+              class="btn-action btn-delete" 
+              (click)="openDeleteConfirm(user)"
+              [disabled]="user.uid === currentUser?.uid">
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Table (Desktop) -->
+      <div *ngIf="!loadingUsers && filteredUsers.length > 0" class="table-container desktop-only">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Carrera</th>
+              <th>Campus</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filteredUsers">
+              <td>
+                <div class="user-name-cell">
+                  <div class="user-avatar">{{ user.nombre?.charAt(0) }}{{ user.apellido?.charAt(0) }}</div>
+                  <div>
+                    <strong>{{ user.nombre }} {{ user.apellido }}</strong>
+                  </div>
+                </div>
+              </td>
+              <td>{{ user.correo }}</td>
+              <td>
+                <span class="badge" [class]="getRoleBadgeClass(user.rol)">
+                  {{ getRoleLabel(user.rol) }}
+                </span>
+              </td>
+              <td>{{ user.carrera || 'N/A' }}</td>
+              <td>{{ user.campus || 'N/A' }}</td>
+              <td>
+                <div class="actions-cell">
+                  <button 
+                    class="btn-action btn-edit" 
+                    (click)="openEditUser(user)"
+                    title="Editar">
+                    Editar
+                  </button>
+                  <button 
+                    class="btn-action btn-delete" 
+                    (click)="openDeleteConfirm(user)"
+                    title="Eliminar"
+                    [disabled]="user.uid === currentUser?.uid">
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loadingUsers && filteredUsers.length === 0" class="empty-state">
+        <div class="empty-icon"></div>
+        <p>No se encontraron usuarios</p>
+        <button (click)="searchTerm = ''; filterRole = 'todos'; filterUsers()" class="btn-clear-filters">
+          Limpiar Filtros
+        </button>
+      </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Total Usuarios</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">en el sistema</span>
+    <!-- ============================================ -->
+    <!-- VISTA: CREAR USUARIO -->
+    <!-- ============================================ -->
+    <div *ngIf="currentView === 'create'" class="view-create">
+      <div class="create-header">
+        <h2>Crear Nuevo Usuario</h2>
+        <p class="info-text">Crea coordinadores y administradores. Los estudiantes se registran públicamente.</p>
       </div>
 
-      <div class="stat-card">
-        <h3>Eventos Totales</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">todos los campus</span>
-      </div>
-
-      <div class="stat-card">
-        <h3>Coordinadores</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">activos</span>
-      </div>
-
-      <div class="stat-card">
-        <h3>Estudiantes</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">registrados</span>
-      </div>
-    </div>
-
-    <!-- Create User Section -->
-    <div class="create-user-section">
-      <h3>Crear Nuevo Usuario (Coordinador/Admin)</h3>
-      <p class="info-text">Los estudiantes se registran desde la página pública de registro</p>
-      
       <form (ngSubmit)="createUser()" class="user-form">
         <div class="form-row">
           <div class="form-group">
-            <label>Nombre *</label>
+            <label>Nombre <span class="required">*</span></label>
             <input 
               type="text" 
               [(ngModel)]="newUser.nombre" 
@@ -74,7 +224,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Correo Electrónico *</label>
+            <label>Correo Electrónico <span class="required">*</span></label>
             <input 
               type="email" 
               [(ngModel)]="newUser.correo" 
@@ -84,7 +234,7 @@
           </div>
 
           <div class="form-group">
-            <label>Contraseña *</label>
+            <label>Contraseña <span class="required">*</span></label>
             <input 
               type="password" 
               [(ngModel)]="newUser.password" 
@@ -96,7 +246,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Rol *</label>
+            <label>Rol <span class="required">*</span></label>
             <select [(ngModel)]="newUser.rol" name="rol" required>
               <option value="">Seleccionar rol</option>
               <option value="coordinador">Coordinador</option>
@@ -106,40 +256,133 @@
 
           <div class="form-group">
             <label>Campus</label>
-            <input 
-              type="text" 
-              [(ngModel)]="newUser.campus" 
-              name="campus" 
-              placeholder="Ej: Tegucigalpa">
+            <select [(ngModel)]="newUser.campus" name="campus">
+              <option value="">Seleccionar campus</option>
+              <option *ngFor="let campus of campuses" [value]="campus">{{ campus }}</option>
+            </select>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn-create" [disabled]="loading">
-            {{ loading ? 'Creando...' : '➕ Crear Usuario' }}
+          <button type="submit" class="btn-submit" [disabled]="loading">
+            {{ loading ? 'Creando...' : 'Crear Usuario' }}
           </button>
           <button type="button" (click)="resetForm()" class="btn-cancel">
             Limpiar
           </button>
         </div>
-
-        <div *ngIf="message" class="message" [class.error]="isError">
-          {{ message }}
-        </div>
       </form>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h3>Gestión del Sistema</h3>
-      <div class="actions-grid">
-        <button class="action-btn">👥 Ver Todos los Usuarios</button>
-        <button class="action-btn">📅 Gestionar Eventos</button>
-        <button class="action-btn">📊 Reportes Generales</button>
-        <button class="action-btn">⚙️ Configuración</button>
-        <button class="action-btn">🎓 Gestionar Carreras</button>
-        <button class="action-btn">🏢 Gestionar Campus</button>
+  </main>
+
+  <!-- ============================================ -->
+  <!-- MODAL: EDITAR USUARIO -->
+  <!-- ============================================ -->
+  <div *ngIf="isEditing" class="modal-overlay" (click)="cancelEdit()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Editar Usuario</h3>
+        <button class="modal-close" (click)="cancelEdit()">×</button>
+      </div>
+
+      <form (ngSubmit)="saveEditUser()" class="modal-form">
+        <div class="form-group">
+          <label>Nombre <span class="required">*</span></label>
+          <input 
+            type="text" 
+            [(ngModel)]="editUser.nombre" 
+            name="editNombre"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Apellido</label>
+          <input 
+            type="text" 
+            [(ngModel)]="editUser.apellido" 
+            name="editApellido">
+        </div>
+
+        <div class="form-group">
+          <label>Correo <span class="required">*</span></label>
+          <input 
+            type="email" 
+            [(ngModel)]="editUser.correo" 
+            name="editCorreo"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Rol <span class="required">*</span></label>
+          <select [(ngModel)]="editUser.rol" name="editRol" required>
+            <option value="estudiante">Estudiante</option>
+            <option value="coordinador">Coordinador</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Campus</label>
+          <select [(ngModel)]="editUser.campus" name="editCampus">
+            <option value="">Seleccionar campus</option>
+            <option *ngFor="let campus of campuses" [value]="campus">{{ campus }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Carrera</label>
+          <select [(ngModel)]="editUser.carrera" name="editCarrera">
+            <option value="">Seleccionar carrera</option>
+            <option *ngFor="let carrera of carreras" [value]="carrera">{{ carrera }}</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" (click)="cancelEdit()" class="btn-cancel">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="loading">
+            {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL: CONFIRMAR ELIMINACIÓN -->
+  <!-- ============================================ -->
+  <div *ngIf="showDeleteConfirm" class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirmar Eliminación</h3>
+        <button class="modal-close" (click)="cancelDelete()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas eliminar al usuario?</p>
+        <div class="user-to-delete">
+          <strong>{{ selectedUser?.nombre }} {{ selectedUser?.apellido }}</strong>
+          <br>
+          <span class="delete-email">{{ selectedUser?.correo }}</span>
+          <br>
+          <span class="badge" [class]="getRoleBadgeClass(selectedUser!.rol)">
+            {{ getRoleLabel(selectedUser!.rol) }}
+          </span>
+        </div>
+        <p class="warning-text">Esta acción no se puede deshacer</p>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="cancelDelete()" class="btn-cancel">
+          Cancelar
+        </button>
+        <button (click)="confirmDelete()" class="btn-delete" [disabled]="loading">
+          {{ loading ? 'Eliminando...' : 'Eliminar' }}
+        </button>
       </div>
     </div>
-  </main>
+  </div>
+
 </div>
