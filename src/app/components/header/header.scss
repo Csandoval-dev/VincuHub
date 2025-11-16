@@ -175,20 +175,27 @@ $transition-base: all 0.3s ease;
   }
 }
 
-// AUTH BUTTONS - Mobile First
 .auth-buttons {
-  display: flex; 
-  gap: 0.5rem; ;
+  display: flex;
+  flex-direction: row;     // Siempre a la par (mobile y desktop)
+  gap: 0.4rem;             // Espaciado pequeño
+
+  button {
+    padding: 0.35rem 0.7rem; // Botones más pequeños
+    font-size: 0.8rem;       // Texto más pequeño
+    border-radius: 6px; 
+    flex: 0 0 auto;          // NO se estiran
+    width: auto;             // Para que queden compactos
   }
 
-  // Tablets y superiores
   @include tablet {
-    display: flex !important;
-    flex-direction: row;
-    gap: $spacing-sm;
-    margin-top: 0;
-    width: auto;
+    gap: 0.10rem;             // Un poquito más de espacio en tablet
+    button {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+    }
   }
+}
 
 
 // BUTTONS - Mobile First
