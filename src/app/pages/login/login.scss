@@ -12,7 +12,7 @@ $bg-light: #fafafa;
 $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 $gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-// Espaciado
+// Espaciado Mobile First
 $spacing-xs: 0.5rem;
 $spacing-sm: 1rem;
 $spacing-md: 1.5rem;
@@ -24,10 +24,10 @@ $radius-sm: 8px;
 $radius-md: 12px;
 $radius-lg: 20px;
 
-// Breakpoints
-$breakpoint-tablet: 968px;
-$breakpoint-mobile: 640px;
-$breakpoint-small: 480px;
+// ⭐ BREAKPOINTS MOBILE FIRST (min-width)
+$bp-phone-large: 480px;  // Teléfonos grandes
+$bp-tablet: 768px;        // Tablets
+$bp-desktop: 1024px;      // Desktop
 
 // Mixins
 @mixin transition($property: all) {
@@ -47,59 +47,98 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// LAYOUT PRINCIPAL
+// LAYOUT PRINCIPAL - MOBILE FIRST
 // ==========================================
 .login-page {
   min-height: 100vh;
   background: $gradient-bg;
+  
+  // 📱 MOBILE: Estilos base (sin media query)
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: $spacing-lg;
+  padding: $spacing-sm; // Padding reducido en móvil
 
-  @media (max-width: $breakpoint-mobile) {
-    padding: $spacing-sm;
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    padding: $spacing-md;
+  }
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: $spacing-lg;
+  }
+
+  // 💻 DESKTOP (≥1024px)
+  @media (min-width: $bp-desktop) {
+    padding: $spacing-xl;
   }
 }
 
 .login-container {
   width: 100%;
-  max-width: 1200px;
   background: white;
-  border-radius: $radius-lg;
   overflow: hidden;
-  @include shadow-lg;
-
+  @include shadow-md;
+  
+  // 📱 MOBILE: Sin bordes redondeados, ocupa toda la pantalla
+  border-radius: 0;
+  min-height: 100vh;
+  
+  // Grid: 1 columna en móvil
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   grid-template-areas:
-    "header header"
-    "form image";
+    "header"
+    "form";
 
-  @media (max-width: $breakpoint-tablet) {
-    grid-template-columns: 1fr;
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    border-radius: $radius-md;
+    min-height: auto;
+    @include shadow-lg;
+  }
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    border-radius: $radius-lg;
+    max-width: 900px;
+  }
+
+  // 💻 DESKTOP (≥1024px) - Grid 2 columnas
+  @media (min-width: $bp-desktop) {
+    max-width: 1200px;
+    grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      "header"
-      "form";
+      "header header"
+      "form image";
   }
 }
 
 // ==========================================
-// HEADER (Logo y navegación)
+// HEADER - MOBILE FIRST
 // ==========================================
 .login-header {
   grid-area: header;
-  padding: $spacing-md $spacing-lg;
   border-bottom: 1px solid $border-color;
-
+  
+  // 📱 MOBILE: Stack vertical, centrado
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  gap: $spacing-md;
+  gap: $spacing-sm;
+  padding: $spacing-md;
 
-  @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    padding: $spacing-md;
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    padding: $spacing-md $spacing-lg;
+  }
+
+  // 📱 TABLET (≥768px) - Horizontal
+  @media (min-width: $bp-tablet) {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: $spacing-md;
   }
 }
 
@@ -107,23 +146,33 @@ $breakpoint-small: 480px;
   display: flex;
   align-items: center;
   gap: $spacing-xs;
-  
   color: $text-light;
   font-weight: 600;
   text-decoration: none;
   @include transition;
 
+  // 📱 MOBILE: Full width, centrado
+  width: 100%;
+  justify-content: center;
+  font-size: 0.9rem;
+
   .arrow {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   &:hover {
     color: $primary-color;
   }
 
-  @media (max-width: $breakpoint-mobile) {
-    width: 100%;
-    justify-content: center;
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    width: auto;
+    justify-content: flex-start;
+    font-size: 1rem;
+
+    .arrow {
+      font-size: 1.5rem;
+    }
   }
 }
 
@@ -132,94 +181,146 @@ $breakpoint-small: 480px;
   align-items: center;
   gap: $spacing-xs;
 
+  // 📱 MOBILE
   .logo-icon {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 
   .logo-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     background: $gradient;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    .logo-icon {
+      font-size: 1.8rem;
+    }
+
+    .logo-text {
+      font-size: 1.3rem;
+    }
+  }
 }
 
 // ==========================================
-// CARD DEL FORMULARIO
+// CARD DEL FORMULARIO - MOBILE FIRST
 // ==========================================
 .login-card {
   grid-area: form;
-  padding: $spacing-xl;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
+  
+  // 📱 MOBILE
+  padding: $spacing-md;
 
-  @media (max-width: $breakpoint-tablet) {
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
     padding: $spacing-lg;
   }
 
-  @media (max-width: $breakpoint-mobile) {
-    padding: $spacing-md;
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: $spacing-lg $spacing-xl;
+  }
+
+  // 💻 DESKTOP (≥1024px)
+  @media (min-width: $bp-desktop) {
+    padding: $spacing-xl;
   }
 }
 
 .card-header {
-  margin-bottom: $spacing-lg;
+  margin-bottom: $spacing-md;
 
   .title {
-    font-size: 2rem;
     font-weight: 800;
     color: $text-dark;
     margin-bottom: $spacing-xs;
     line-height: 1.2;
+    
+    // 📱 MOBILE
+    font-size: 1.5rem;
 
-    @media (max-width: $breakpoint-mobile) {
-      font-size: 1.5rem;
+    // 📱 PHONE LARGE (≥480px)
+    @media (min-width: $bp-phone-large) {
+      font-size: 1.75rem;
+    }
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 2rem;
+    }
+
+    // 💻 DESKTOP (≥1024px)
+    @media (min-width: $bp-desktop) {
+      font-size: 2.25rem;
     }
   }
 
   .subtitle {
-    font-size: 1rem;
     color: $text-light;
+    
+    // 📱 MOBILE
+    font-size: 0.875rem;
 
-    @media (max-width: $breakpoint-mobile) {
-      font-size: 0.9rem;
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 1rem;
     }
   }
 }
 
 // ==========================================
-// FORMULARIO
+// FORMULARIO - MOBILE FIRST
 // ==========================================
 .login-form {
   width: 100%;
 }
 
-// Form Groups
 .form-group {
-  margin-bottom: $spacing-md;
+  // 📱 MOBILE
+  margin-bottom: $spacing-sm;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    margin-bottom: $spacing-md;
+  }
 
   label {
     display: block;
     margin-bottom: $spacing-xs;
-    
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: $text-medium;
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 0.9rem;
+    }
   }
 
   .form-control {
     width: 100%;
-    padding: 0.8rem $spacing-sm;
-    
-    font-size: 1rem;
+    box-sizing: border-box;
     border: 2px solid $border-color;
     border-radius: $radius-sm;
-    box-sizing: border-box;
     @include transition;
+
+    // 📱 MOBILE
+    padding: 0.7rem $spacing-sm;
+    font-size: 16px; // ⚠️ Importante: 16px previene zoom en iOS
+
+    // 📱 PHONE LARGE (≥480px)
+    @media (min-width: $bp-phone-large) {
+      padding: 0.8rem $spacing-sm;
+      font-size: 1rem;
+    }
 
     &:focus {
       outline: none;
@@ -233,18 +334,24 @@ $breakpoint-small: 480px;
   }
 }
 
-// Opciones del formulario
+// ==========================================
+// OPCIONES DEL FORMULARIO - MOBILE FIRST
+// ==========================================
 .form-options {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
   gap: $spacing-sm;
   margin-bottom: $spacing-md;
+  
+  // 📱 MOBILE: Stack vertical
+  flex-direction: column;
+  align-items: flex-start;
 
-  @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    align-items: flex-start;
+  // 📱 PHONE LARGE (≥480px) - Horizontal
+  @media (min-width: $bp-phone-large) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
   }
 }
 
@@ -252,24 +359,44 @@ $breakpoint-small: 480px;
   display: flex;
   align-items: center;
   gap: $spacing-xs;
-  
-  font-size: 0.9rem;
   color: $text-light;
   cursor: pointer;
+  
+  // 📱 MOBILE
+  font-size: 0.875rem;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    font-size: 0.9rem;
+  }
 
   input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+    // 📱 MOBILE: Más grande para facilitar tap
+    width: 18px;
+    height: 18px;
     cursor: pointer;
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      width: 16px;
+      height: 16px;
+    }
   }
 }
 
 .forgot-link {
-  font-size: 0.9rem;
   font-weight: 600;
   color: $primary-color;
   text-decoration: none;
   @include transition(color);
+  
+  // 📱 MOBILE
+  font-size: 0.875rem;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    font-size: 0.9rem;
+  }
 
   &:hover {
     color: darken($primary-color, 10%);
@@ -278,25 +405,32 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// BOTONES
+// BOTONES - MOBILE FIRST
 // ==========================================
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: $spacing-xs;
-  
-  padding: 0.8rem $spacing-md;
-  font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: $radius-sm;
   cursor: pointer;
   @include transition;
+  
+  // 📱 MOBILE: Botones más grandes para tap
+  padding: $spacing-sm;
+  font-size: 1rem;
+  min-height: 44px; // ⚠️ Mínimo recomendado para touch
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: 0.8rem $spacing-md;
+    min-height: auto;
+  }
 
   &.btn-block {
     width: 100%;
-    padding: $spacing-sm;
   }
 
   &.btn-primary {
@@ -331,12 +465,19 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// DIVIDER Y SOCIAL BUTTONS
+// DIVIDER - MOBILE FIRST
 // ==========================================
 .divider {
   position: relative;
   text-align: center;
-  margin: $spacing-md 0;
+  
+  // 📱 MOBILE
+  margin: $spacing-sm 0;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    margin: $spacing-md 0;
+  }
 
   &::before {
     content: '';
@@ -352,21 +493,31 @@ $breakpoint-small: 480px;
     position: relative;
     display: inline-block;
     padding: 0 $spacing-sm;
-    
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: #94a3b8;
     background: white;
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 0.9rem;
+    }
   }
 }
 
+// ==========================================
+// BOTONES SOCIALES - MOBILE FIRST (GRID)
+// ==========================================
 .social-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: $spacing-sm;
   margin-bottom: $spacing-md;
+  
+  // 📱 MOBILE: 1 columna (stack vertical)
+  grid-template-columns: 1fr;
 
-  @media (max-width: $breakpoint-small) {
-    grid-template-columns: 1fr;
+  // 📱 PHONE LARGE (≥480px): 2 columnas
+  @media (min-width: $bp-phone-large) {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .icon-google::before {
@@ -384,8 +535,15 @@ $breakpoint-small: 480px;
 
 .register-link {
   text-align: center;
-  font-size: 0.95rem;
   color: $text-light;
+  
+  // 📱 MOBILE
+  font-size: 0.875rem;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    font-size: 0.95rem;
+  }
 
   a {
     font-weight: 600;
@@ -401,23 +559,30 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// SECCIÓN DE IMAGEN
+// SECCIÓN DE IMAGEN - MOBILE FIRST
 // ==========================================
 .login-image {
   grid-area: image;
   position: relative;
-  padding: $spacing-xl;
-  
   background: $gradient;
   color: white;
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  // 📱 MOBILE y TABLET: Oculto
+  display: none;
 
-  @media (max-width: $breakpoint-tablet) {
-    display: none;
+  // 💻 DESKTOP (≥1024px): Visible
+  @media (min-width: $bp-desktop) {
+    display: flex;
+    padding: $spacing-lg;
+  }
+
+  // 💻 DESKTOP LARGE (≥1200px)
+  @media (min-width: 1200px) {
+    padding: $spacing-xl;
   }
 
   // Efecto de fondo animado
@@ -439,21 +604,31 @@ $breakpoint-small: 480px;
   max-width: 500px;
 
   h2 {
-    font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: $spacing-sm;
     line-height: 1.2;
+    
+    // 💻 DESKTOP (≥1024px)
+    font-size: 2rem;
 
-    @media (max-width: 1100px) {
-      font-size: 2rem;
+    // 💻 DESKTOP LARGE (≥1200px)
+    @media (min-width: 1200px) {
+      font-size: 2.5rem;
     }
   }
 
   p {
-    font-size: 1.1rem;
     opacity: 0.9;
     margin-bottom: $spacing-lg;
     line-height: 1.6;
+    
+    // 💻 DESKTOP (≥1024px)
+    font-size: 1rem;
+
+    // 💻 DESKTOP LARGE (≥1200px)
+    @media (min-width: 1200px) {
+      font-size: 1.1rem;
+    }
   }
 
   .features {
@@ -471,12 +646,10 @@ $breakpoint-small: 480px;
     .feature-icon {
       width: 28px;
       height: 28px;
-      
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      
       background: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       font-weight: 700;
@@ -493,5 +666,33 @@ $breakpoint-small: 480px;
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+// ==========================================
+// 📱 MEJORAS MOBILE ESPECÍFICAS
+// ==========================================
+
+// Prevenir zoom en inputs en iOS
+@media (max-width: 479px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important; // Previene zoom automático
+  }
+}
+
+// Safe areas para iPhones con notch
+@supports (padding: max(0px)) {
+  .login-page {
+    padding-left: max($spacing-sm, env(safe-area-inset-left));
+    padding-right: max($spacing-sm, env(safe-area-inset-right));
+  }
+
+  .login-container {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
 }

@@ -24,10 +24,10 @@ $radius-sm: 8px;
 $radius-md: 12px;
 $radius-lg: 20px;
 
-// Breakpoints
-$breakpoint-tablet: 968px;
-$breakpoint-mobile: 640px;
-$breakpoint-small: 480px;
+// ⭐ BREAKPOINTS MOBILE FIRST (min-width)
+$bp-phone-large: 480px;  // Teléfonos grandes
+$bp-tablet: 768px;        // Tablets
+$bp-desktop: 1024px;      // Desktop
 
 // Mixins
 @mixin transition($property: all) {
@@ -47,7 +47,7 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// LAYOUT PRINCIPAL
+// LAYOUT PRINCIPAL - MOBILE FIRST
 // ==========================================
 .registro-page {
   min-height: 100vh;
@@ -55,52 +55,94 @@ $breakpoint-small: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: $spacing-lg;
+  
+  // 📱 MOBILE: Padding mínimo
+  padding: $spacing-sm;
 
-  @media (max-width: $breakpoint-mobile) {
-    padding: $spacing-sm;
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    padding: $spacing-md;
+  }
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: $spacing-lg;
+  }
+
+  // 💻 DESKTOP (≥1024px)
+  @media (min-width: $bp-desktop) {
+    padding: $spacing-xl;
   }
 }
 
 .registro-container {
   width: 100%;
-  max-width: 1200px;
   background: white;
-  border-radius: $radius-lg;
   overflow: hidden;
-  @include shadow-lg;
-
+  @include shadow-md;
+  
+  // 📱 MOBILE: Sin bordes, pantalla completa
+  border-radius: 0;
+  min-height: 100vh;
+  
+  // Grid Mobile First: 1 columna
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   grid-template-areas:
-    "header header"
-    "image form";
+    "header"
+    "form";
 
-  @media (max-width: $breakpoint-tablet) {
-    grid-template-columns: 1fr;
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    border-radius: $radius-md;
+    min-height: auto;
+    @include shadow-lg;
+  }
+
+  // 📱 TABLET (≥768px): Mostrar imagen arriba
+  @media (min-width: $bp-tablet) {
+    border-radius: $radius-lg;
+    max-width: 900px;
     grid-template-areas:
       "header"
       "image"
       "form";
   }
+
+  // 💻 DESKTOP (≥1024px): Imagen a la izquierda
+  @media (min-width: $bp-desktop) {
+    max-width: 1200px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header header"
+      "image form";
+  }
 }
 
 // ==========================================
-// HEADER (Logo y navegación)
+// HEADER - MOBILE FIRST
 // ==========================================
 .registro-header {
   grid-area: header;
-  padding: $spacing-md $spacing-lg;
   border-bottom: 1px solid $border-color;
-
+  
+  // 📱 MOBILE: Stack vertical, centrado
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  gap: $spacing-md;
+  gap: $spacing-sm;
+  padding: $spacing-md;
 
-  @media (max-width: $breakpoint-small) {
-    flex-direction: column;
-    padding: $spacing-md;
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    padding: $spacing-md $spacing-lg;
+  }
+
+  // 📱 TABLET (≥768px): Horizontal
+  @media (min-width: $bp-tablet) {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: $spacing-md;
   }
 }
 
@@ -108,23 +150,33 @@ $breakpoint-small: 480px;
   display: flex;
   align-items: center;
   gap: $spacing-xs;
-  
   color: $text-light;
   font-weight: 600;
   text-decoration: none;
   @include transition;
 
+  // 📱 MOBILE: Full width, centrado
+  width: 100%;
+  justify-content: center;
+  font-size: 0.9rem;
+
   .arrow {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   &:hover {
     color: $primary-color;
   }
 
-  @media (max-width: $breakpoint-small) {
-    width: 100%;
-    justify-content: center;
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    width: auto;
+    justify-content: flex-start;
+    font-size: 1rem;
+
+    .arrow {
+      font-size: 1.5rem;
+    }
   }
 }
 
@@ -133,35 +185,47 @@ $breakpoint-small: 480px;
   align-items: center;
   gap: $spacing-xs;
 
+  // 📱 MOBILE
   .logo-icon {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
 
   .logo-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     background: $gradient;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
+    .logo-icon {
+      font-size: 1.8rem;
+    }
+
+    .logo-text {
+      font-size: 1.3rem;
+    }
+  }
 }
 
 // ==========================================
-// SECCIÓN DE IMAGEN
+// SECCIÓN DE IMAGEN - MOBILE FIRST
 // ==========================================
 .registro-image {
   grid-area: image;
   position: relative;
-  padding: $spacing-xl;
-  
   background: $gradient;
   color: white;
   overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  // 📱 MOBILE: Oculta por defecto
+  display: none;
 
   // Efecto de fondo animado
   &::before {
@@ -175,8 +239,20 @@ $breakpoint-small: 480px;
     animation: rotate 20s linear infinite;
   }
 
-  @media (max-width: $breakpoint-tablet) {
+  // 📱 PHONE LARGE (≥480px): Visible pero compacta
+  @media (min-width: $bp-phone-large) {
+    display: flex;
     padding: $spacing-lg;
+  }
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: $spacing-xl;
+  }
+
+  // 💻 DESKTOP (≥1024px)
+  @media (min-width: $bp-desktop) {
+    padding: $spacing-xl;
   }
 }
 
@@ -184,40 +260,72 @@ $breakpoint-small: 480px;
   position: relative;
   z-index: 1;
   max-width: 500px;
+  text-align: center;
 
   h2 {
-    font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: $spacing-sm;
     line-height: 1.2;
+    
+    // 📱 PHONE LARGE (≥480px)
+    font-size: 1.5rem;
 
-    @media (max-width: $breakpoint-tablet) {
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
       font-size: 1.8rem;
+    }
+
+    // 💻 DESKTOP (≥1024px)
+    @media (min-width: $bp-desktop) {
+      font-size: 2.5rem;
     }
   }
 
   p {
-    font-size: 1.1rem;
     opacity: 0.9;
-    margin-bottom: $spacing-xl;
     line-height: 1.6;
+    
+    // 📱 PHONE LARGE (≥480px)
+    font-size: 0.95rem;
+    margin-bottom: $spacing-md;
 
-    @media (max-width: $breakpoint-tablet) {
-      margin-bottom: $spacing-md;
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 1rem;
+      margin-bottom: $spacing-lg;
+    }
+
+    // 💻 DESKTOP (≥1024px)
+    @media (min-width: $bp-desktop) {
+      font-size: 1.1rem;
+      margin-bottom: $spacing-xl;
     }
   }
 
+  // ==========================================
+  // STATS GRID - MOBILE FIRST
+  // ==========================================
   .stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: $spacing-lg;
+    gap: $spacing-sm;
+    
+    // 📱 MOBILE: 1 columna (stack)
+    grid-template-columns: 1fr;
 
-    @media (max-width: $breakpoint-tablet) {
+    // 📱 PHONE LARGE (≥480px): 3 columnas
+    @media (min-width: $bp-phone-large) {
+      grid-template-columns: repeat(3, 1fr);
       gap: $spacing-sm;
     }
 
-    @media (max-width: $breakpoint-small) {
-      gap: $spacing-xs;
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      gap: $spacing-md;
+    }
+
+    // 💻 DESKTOP (≥1024px)
+    @media (min-width: $bp-desktop) {
+      gap: $spacing-lg;
     }
   }
 
@@ -225,116 +333,174 @@ $breakpoint-small: 480px;
     text-align: center;
 
     h3 {
-      font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 0.3rem;
+      
+      // 📱 PHONE LARGE (≥480px)
+      font-size: 1.5rem;
 
-      @media (max-width: $breakpoint-tablet) {
+      // 📱 TABLET (≥768px)
+      @media (min-width: $bp-tablet) {
         font-size: 1.8rem;
       }
 
-      @media (max-width: $breakpoint-small) {
-        font-size: 1.5rem;
+      // 💻 DESKTOP (≥1024px)
+      @media (min-width: $bp-desktop) {
+        font-size: 2.5rem;
       }
     }
 
     p {
-      font-size: 0.95rem;
       opacity: 0.8;
       margin: 0;
+      
+      // 📱 PHONE LARGE (≥480px)
+      font-size: 0.8rem;
 
-      @media (max-width: $breakpoint-small) {
-        font-size: 0.8rem;
+      // 📱 TABLET (≥768px)
+      @media (min-width: $bp-tablet) {
+        font-size: 0.9rem;
+      }
+
+      // 💻 DESKTOP (≥1024px)
+      @media (min-width: $bp-desktop) {
+        font-size: 0.95rem;
       }
     }
   }
 }
 
 // ==========================================
-// CARD DEL FORMULARIO
+// CARD DEL FORMULARIO - MOBILE FIRST
 // ==========================================
 .registro-card {
   grid-area: form;
-  padding: $spacing-xl;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
+  
+  // 📱 MOBILE
+  padding: $spacing-md;
 
-  @media (max-width: $breakpoint-tablet) {
+  // 📱 PHONE LARGE (≥480px)
+  @media (min-width: $bp-phone-large) {
     padding: $spacing-lg;
   }
 
-  @media (max-width: $breakpoint-small) {
-    padding: $spacing-md;
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: $spacing-lg $spacing-xl;
+  }
+
+  // 💻 DESKTOP (≥1024px)
+  @media (min-width: $bp-desktop) {
+    padding: $spacing-xl;
   }
 }
 
 .card-header {
-  margin-bottom: $spacing-lg;
+  margin-bottom: $spacing-md;
 
   .title {
-    font-size: 2rem;
     font-weight: 800;
     color: $text-dark;
     margin-bottom: $spacing-xs;
     line-height: 1.2;
+    
+    // 📱 MOBILE
+    font-size: 1.5rem;
 
-    @media (max-width: $breakpoint-small) {
-      font-size: 1.5rem;
+    // 📱 PHONE LARGE (≥480px)
+    @media (min-width: $bp-phone-large) {
+      font-size: 1.75rem;
+    }
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 2rem;
+    }
+
+    // 💻 DESKTOP (≥1024px)
+    @media (min-width: $bp-desktop) {
+      font-size: 2.25rem;
     }
   }
 
   .subtitle {
-    font-size: 1rem;
     color: $text-light;
+    
+    // 📱 MOBILE
+    font-size: 0.875rem;
 
-    @media (max-width: $breakpoint-small) {
-      font-size: 0.9rem;
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 1rem;
     }
   }
 }
 
 // ==========================================
-// FORMULARIO
+// FORMULARIO - MOBILE FIRST
 // ==========================================
 .registro-form {
   width: 100%;
 }
 
-// Form Row (para campos en fila)
+// ==========================================
+// FORM ROW - MOBILE FIRST (GRID)
+// ==========================================
 .form-row {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: $spacing-sm;
+  
+  // 📱 MOBILE: 1 columna (stack vertical)
+  grid-template-columns: 1fr;
 
-  @media (max-width: $breakpoint-tablet) {
-    grid-template-columns: 1fr;
+  // 📱 PHONE LARGE (≥480px): 2 columnas
+  @media (min-width: $bp-phone-large) {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 // Form Groups
 .form-group {
-  margin-bottom: $spacing-md;
+  // 📱 MOBILE
+  margin-bottom: $spacing-sm;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    margin-bottom: $spacing-md;
+  }
 
   label {
     display: block;
     margin-bottom: $spacing-xs;
-    
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: $text-medium;
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 0.9rem;
+    }
   }
 
   .form-control {
     width: 100%;
-    padding: 0.8rem $spacing-sm;
-    
-    font-size: 1rem;
+    box-sizing: border-box;
     border: 2px solid $border-color;
     border-radius: $radius-sm;
-    box-sizing: border-box;
     @include transition;
+
+    // 📱 MOBILE: 16px previene zoom en iOS
+    padding: 0.7rem $spacing-sm;
+    font-size: 16px;
+
+    // 📱 PHONE LARGE (≥480px)
+    @media (min-width: $bp-phone-large) {
+      padding: 0.8rem $spacing-sm;
+      font-size: 1rem;
+    }
 
     &:focus {
       outline: none;
@@ -347,33 +513,57 @@ $breakpoint-small: 480px;
     }
   }
 
+  // Select personalizado
   select.form-control {
     cursor: pointer;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right $spacing-sm center;
-    padding-right: 2.5rem;
+    
+    // 📱 MOBILE
+    padding-right: 2rem;
+
+    // 📱 PHONE LARGE (≥480px)
+    @media (min-width: $bp-phone-large) {
+      padding-right: 2.5rem;
+    }
   }
 }
 
-// Checkbox con términos
+// ==========================================
+// CHECKBOX - MOBILE FIRST
+// ==========================================
 .checkbox {
   display: flex;
-  align-items: flex-start;
   gap: $spacing-xs;
-  
-  font-size: 0.9rem;
-  color: $text-light;
   cursor: pointer;
   margin-bottom: $spacing-md;
+  
+  // 📱 MOBILE: Alineación al inicio para texto largo
+  align-items: flex-start;
+  color: $text-light;
+  font-size: 0.875rem;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    font-size: 0.9rem;
+  }
 
   input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin-top: 2px;
-    cursor: pointer;
     flex-shrink: 0;
+    cursor: pointer;
+    margin-top: 2px;
+    
+    // 📱 MOBILE: Más grande para facilitar tap
+    width: 18px;
+    height: 18px;
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      width: 16px;
+      height: 16px;
+    }
   }
 
   a {
@@ -390,25 +580,32 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// BOTONES
+// BOTONES - MOBILE FIRST
 // ==========================================
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: $spacing-xs;
-  
-  padding: 0.8rem $spacing-md;
-  font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: $radius-sm;
   cursor: pointer;
   @include transition;
+  
+  // 📱 MOBILE: Más grandes para tap
+  padding: $spacing-sm;
+  font-size: 1rem;
+  min-height: 44px;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    padding: 0.8rem $spacing-md;
+    min-height: auto;
+  }
 
   &.btn-block {
     width: 100%;
-    padding: $spacing-sm;
   }
 
   &.btn-primary {
@@ -443,12 +640,19 @@ $breakpoint-small: 480px;
 }
 
 // ==========================================
-// DIVIDER Y SOCIAL BUTTONS
+// DIVIDER - MOBILE FIRST
 // ==========================================
 .divider {
   position: relative;
   text-align: center;
-  margin: $spacing-md 0;
+  
+  // 📱 MOBILE
+  margin: $spacing-sm 0;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    margin: $spacing-md 0;
+  }
 
   &::before {
     content: '';
@@ -464,21 +668,31 @@ $breakpoint-small: 480px;
     position: relative;
     display: inline-block;
     padding: 0 $spacing-sm;
-    
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: #94a3b8;
     background: white;
+
+    // 📱 TABLET (≥768px)
+    @media (min-width: $bp-tablet) {
+      font-size: 0.9rem;
+    }
   }
 }
 
+// ==========================================
+// BOTONES SOCIALES - MOBILE FIRST (GRID)
+// ==========================================
 .social-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: $spacing-sm;
   margin-bottom: $spacing-md;
+  
+  // 📱 MOBILE: 1 columna
+  grid-template-columns: 1fr;
 
-  @media (max-width: $breakpoint-small) {
-    grid-template-columns: 1fr;
+  // 📱 PHONE LARGE (≥480px): 2 columnas
+  @media (min-width: $bp-phone-large) {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .icon-google::before {
@@ -496,8 +710,15 @@ $breakpoint-small: 480px;
 
 .login-link {
   text-align: center;
-  font-size: 0.95rem;
   color: $text-light;
+  
+  // 📱 MOBILE
+  font-size: 0.875rem;
+
+  // 📱 TABLET (≥768px)
+  @media (min-width: $bp-tablet) {
+    font-size: 0.95rem;
+  }
 
   a {
     font-weight: 600;
@@ -521,5 +742,34 @@ $breakpoint-small: 480px;
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+// ==========================================
+// 📱 MEJORAS MOBILE ESPECÍFICAS
+// ==========================================
+
+// Prevenir zoom en inputs en iOS
+@media (max-width: 479px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+// Safe areas para iPhones con notch
+@supports (padding: max(0px)) {
+  .registro-page {
+    padding-left: max($spacing-sm, env(safe-area-inset-left));
+    padding-right: max($spacing-sm, env(safe-area-inset-right));
+  }
+
+  .registro-container {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
 }
