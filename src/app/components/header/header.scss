@@ -177,14 +177,8 @@ $transition-base: all 0.3s ease;
 
 // AUTH BUTTONS - Mobile First
 .auth-buttons {
-  display: none; // Ocultos por defecto en mobile
-
-  &.active {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-sm;
-    margin-top: $spacing-md;
-    width: 100%;
+  display: flex; 
+  gap: 0.5rem; ;
   }
 
   // Tablets y superiores
