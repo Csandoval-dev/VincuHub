@@ -1,41 +1,114 @@
-// Variables
+// ============================================
+// FOOTER COMPONENT - MOBILE FIRST
+// ============================================
+
+// Variables locales del componente
 $primary-color: #6366f1;
 $secondary-color: #8b5cf6;
 $dark-bg: #1e293b;
-$darker-bg: #0f172a;
 $text-light: #cbd5e1;
 $text-lighter: #94a3b8;
+$gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+// Mixins
+@mixin phone-large {
+  @media (min-width: $breakpoint-sm) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) { @content; }
+}
+
+// Espaciado
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Tipografía
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+
+// Transiciones
+$transition-base: all 0.3s ease;
+
+// BASE STYLES (Mobile ≤ 480px)
 .footer {
   background: $dark-bg;
   color: $text-light;
   position: relative;
 }
 
-// Main Footer
+// MAIN FOOTER
 .footer-main {
-  padding: 4rem 0 2rem;
-  
+  padding: $spacing-xl 0 $spacing-lg;
+
   .container {
-    max-width: 1200px;
+    padding: 0 $spacing-sm;
     margin: 0 auto;
-    padding: 0 2rem;
+  }
+
+  // Tablets
+  @include tablet {
+    padding: 4rem 0 2rem;
+
+    .container {
+      padding: 0 $spacing-lg;
+      max-width: 1200px;
+    }
   }
 }
 
+// FOOTER GRID - Mobile First (1 columna)
 .footer-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: 3rem;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  margin-bottom: $spacing-lg;
+
+  // Tablets - Empezar a usar grid
+  @include tablet {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: $spacing-lg;
+
+    .footer-newsletter {
+      grid-column: 1 / -1; // Full width en tablet
+    }
+  }
+
+  // Desktop - Grid completo
+  @include desktop {
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 3rem;
+
+    .footer-newsletter {
+      grid-column: auto; // Normal flow en desktop
+    }
+  }
 }
 
+// FOOTER COLUMN
 .footer-col {
   .footer-title {
-    font-size: 1.1rem;
+    font-size: $font-size-lg;
     font-weight: 700;
     color: white;
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-md;
     position: relative;
     display: inline-block;
 
@@ -46,28 +119,35 @@ $text-lighter: #94a3b8;
       left: 0;
       width: 40px;
       height: 3px;
-      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      background: $gradient;
       border-radius: 2px;
+    }
+  }
+
+  // Tablets
+  @include tablet {
+    .footer-title {
+      font-size: $font-size-xl;
     }
   }
 }
 
-// Company Info
+// COMPANY INFO
 .footer-about {
   .footer-logo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.4rem;
+    margin-bottom: $spacing-sm;
 
     .logo-icon {
-      font-size: 2rem;
+      font-size: 1.5rem;
     }
 
     .logo-text {
-      font-size: 1.5rem;
+      font-size: $font-size-xl;
       font-weight: 700;
-      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      background: $gradient;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -76,14 +156,35 @@ $text-lighter: #94a3b8;
   .footer-description {
     color: $text-lighter;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-md;
+    font-size: $font-size-sm;
+  }
+
+  // Tablets
+  @include tablet {
+    .footer-logo {
+      gap: 0.5rem;
+
+      .logo-icon {
+        font-size: 2rem;
+      }
+
+      .logo-text {
+        font-size: $font-size-2xl;
+      }
+    }
+
+    .footer-description {
+      font-size: $font-size-base;
+    }
   }
 }
 
-// Social Links
+// SOCIAL LINKS - Mobile First
 .social-links {
   display: flex;
-  gap: 0.8rem;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 
   .social-link {
     width: 40px;
@@ -96,24 +197,25 @@ $text-lighter: #94a3b8;
     justify-content: center;
     color: $text-light;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: $transition-base;
     font-weight: 700;
 
-    .social-icon {
-      font-size: 1.1rem;
-    }
-
     &:hover {
-      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      background: $gradient;
       border-color: transparent;
       transform: translateY(-3px);
       box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
       color: white;
     }
   }
+
+  // Tablets
+  @include tablet {
+    gap: 0.8rem;
+  }
 }
 
-// Footer Links
+// FOOTER LINKS
 .footer-links {
   list-style: none;
   padding: 0;
@@ -126,9 +228,10 @@ $text-lighter: #94a3b8;
   .footer-link {
     color: $text-lighter;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: $transition-base;
     display: inline-block;
     position: relative;
+    font-size: $font-size-sm;
 
     &::before {
       content: '';
@@ -150,34 +253,42 @@ $text-lighter: #94a3b8;
       }
     }
   }
+
+  // Tablets
+  @include tablet {
+    .footer-link {
+      font-size: $font-size-base;
+    }
+  }
 }
 
-// Newsletter
+// NEWSLETTER - Mobile First
 .footer-newsletter {
   .newsletter-text {
     color: $text-lighter;
     line-height: 1.6;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
+    margin-bottom: $spacing-sm;
+    font-size: $font-size-sm;
   }
 
   .newsletter-form {
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-md;
 
     .input-group {
       display: flex;
-      gap: 0.5rem;
+      flex-direction: column; // Stack en mobile
+      gap: $spacing-sm;
     }
 
     .newsletter-input {
-      flex: 1;
+      width: 100%;
       padding: 0.8rem 1rem;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: white;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
+      font-size: $font-size-sm;
+      transition: $transition-base;
 
       &::placeholder {
         color: $text-lighter;
@@ -192,18 +303,20 @@ $text-lighter: #94a3b8;
     }
 
     .newsletter-button {
+      width: 100%; // Full width en mobile
       padding: 0.8rem 1.5rem;
-      background: linear-gradient(135deg, $primary-color, $secondary-color);
+      background: $gradient;
       border: none;
       border-radius: 8px;
       color: white;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: $transition-base;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
-      white-space: nowrap;
+      font-size: $font-size-sm;
 
       .btn-icon {
         transition: transform 0.3s ease;
@@ -219,9 +332,33 @@ $text-lighter: #94a3b8;
       }
     }
   }
+
+  // Tablets - Horizontal input
+  @include tablet {
+    .newsletter-text {
+      font-size: $font-size-base;
+    }
+
+    .newsletter-form {
+      .input-group {
+        flex-direction: row;
+      }
+
+      .newsletter-input {
+        flex: 1;
+        font-size: $font-size-base;
+      }
+
+      .newsletter-button {
+        width: auto;
+        white-space: nowrap;
+        font-size: $font-size-base;
+      }
+    }
+  }
 }
 
-// Contact Info
+// CONTACT INFO
 .contact-info {
   display: flex;
   flex-direction: column;
@@ -229,57 +366,89 @@ $text-lighter: #94a3b8;
 
   .contact-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.5rem;
     color: $text-lighter;
-    font-size: 0.9rem;
+    font-size: $font-size-sm;
+    line-height: 1.5;
 
     .contact-icon {
       font-size: 1rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+  }
+
+  // Tablets
+  @include tablet {
+    .contact-item {
+      font-size: $font-size-base;
     }
   }
 }
 
-// Footer Bottom
+// FOOTER BOTTOM
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1.5rem 0;
+  padding: $spacing-md 0;
 
   .container {
-    max-width: 1200px;
+    padding: 0 $spacing-sm;
     margin: 0 auto;
-    padding: 0 2rem;
   }
 
   .footer-bottom-content {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; // Stack en mobile
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    text-align: center;
+    gap: $spacing-md;
 
     .copyright {
       color: $text-lighter;
       margin: 0;
-      font-size: 0.9rem;
+      font-size: $font-size-xs;
+      width: 100%;
+    }
+  }
+
+  // Tablets - Horizontal
+  @include tablet {
+    padding: $spacing-lg 0;
+
+    .container {
+      padding: 0 $spacing-lg;
+      max-width: 1200px;
+    }
+
+    .footer-bottom-content {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+
+      .copyright {
+        width: auto;
+        font-size: $font-size-sm;
+      }
     }
   }
 }
 
+// LEGAL LINKS - Mobile First
 .legal-links {
   display: flex;
+  flex-direction: column; // Stack en mobile
   align-items: center;
-  gap: 0.5rem;
+  gap: $spacing-sm;
   list-style: none;
   padding: 0;
   margin: 0;
-  flex-wrap: wrap;
 
   .legal-link {
     color: $text-lighter;
     text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
+    font-size: $font-size-xs;
+    transition: $transition-base;
 
     &:hover {
       color: white;
@@ -287,28 +456,43 @@ $text-lighter: #94a3b8;
   }
 
   .separator {
-    color: $text-lighter;
+    display: none; // Ocultar en mobile
+  }
+
+  // Tablets - Horizontal con separadores
+  @include tablet {
+    flex-direction: row;
+    gap: $spacing-xs;
+
+    .legal-link {
+      font-size: $font-size-sm;
+    }
+
+    .separator {
+      display: inline;
+      color: $text-lighter;
+    }
   }
 }
 
-// Back to Top Button
+// BACK TO TOP BUTTON
 .back-to-top {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, $primary-color, $secondary-color);
+  bottom: $spacing-sm;
+  right: $spacing-sm;
+  width: 45px;
+  height: 45px;
+  background: $gradient;
   border: none;
   border-radius: 12px;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-  transition: all 0.3s ease;
+  transition: $transition-base;
   z-index: 100;
 
   .arrow-up {
@@ -323,88 +507,13 @@ $text-lighter: #94a3b8;
       transform: translateY(-3px);
     }
   }
-}
 
-// Responsive
-@media (max-width: 1024px) {
-  .footer-grid {
-    grid-template-columns: 2fr 1fr 1fr;
-    
-    .footer-newsletter {
-      grid-column: 1 / -1;
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .footer-main {
-    padding: 3rem 0 2rem;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-
-  .footer-about {
-    .footer-description {
-      max-width: 100%;
-    }
-  }
-
-  .footer-bottom-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
-
-    .copyright {
-      width: 100%;
-    }
-  }
-
-  .legal-links {
-    justify-content: center;
-  }
-
-  .back-to-top {
-    bottom: 1rem;
-    right: 1rem;
-    width: 45px;
-    height: 45px;
-  }
-
-  .newsletter-form {
-    .input-group {
-      flex-direction: column;
-    }
-
-    .newsletter-button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-main {
-    padding: 2rem 0 1.5rem;
-  }
-
-  .footer-grid {
-    gap: 2rem;
-  }
-
-  .social-links {
-    flex-wrap: wrap;
-  }
-
-  .legal-links {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
-
-    .separator {
-      display: none;
-    }
+  // Tablets
+  @include tablet {
+    bottom: $spacing-lg;
+    right: $spacing-lg;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
   }
 }

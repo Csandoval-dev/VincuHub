@@ -1,25 +1,85 @@
-// Variables
+// ============================================
+// HERO COMPONENT - MOBILE FIRST
+// ============================================
+
+// Variables locales del componente
 $primary-color: #6366f1;
 $secondary-color: #8b5cf6;
 $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+// Mixins
+@mixin phone-large {
+  @media (min-width: $breakpoint-sm) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) { @content; }
+}
+
+// Espaciado
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Tipografía
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 2rem;
+$font-size-4xl: 2.5rem;
+
+// Transiciones
+$transition-base: all 0.3s ease;
+
+// BASE STYLES (Mobile ≤ 480px)
 .hero-section {
   position: relative;
-  min-height: 100vh;
-  padding: 120px 0 80px;
+  min-height: calc(100vh - 60px);
+  padding: 80px 0 $spacing-xl;
   overflow: hidden;
   background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
 
   .container {
-    max-width: 1200px;
+    padding: 0 $spacing-sm;
     margin: 0 auto;
-    padding: 0 2rem;
     position: relative;
     z-index: 2;
   }
+
+  // Tablets
+  @include tablet {
+    padding: 100px 0 60px;
+
+    .container {
+      padding: 0 $spacing-lg;
+    }
+  }
+
+  // Desktop
+  @include desktop {
+    padding: 120px 0 80px;
+
+    .container {
+      max-width: 1200px;
+    }
+  }
 }
 
-// Background Shapes
+// BACKGROUND SHAPES
 .hero-background {
   position: absolute;
   top: 0;
@@ -32,66 +92,131 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
   .hero-shape {
     position: absolute;
     border-radius: 50%;
-    opacity: 0.1;
-    filter: blur(60px);
+    opacity: 0.08; // Más sutil en mobile
+    filter: blur(40px);
     animation: float 20s infinite ease-in-out;
 
     &.shape-1 {
-      width: 500px;
-      height: 500px;
+      width: 250px;
+      height: 250px;
       background: $primary-color;
-      top: -100px;
-      right: -100px;
-      animation-delay: 0s;
+      top: -50px;
+      right: -50px;
     }
 
     &.shape-2 {
-      width: 400px;
-      height: 400px;
+      width: 200px;
+      height: 200px;
       background: $secondary-color;
-      bottom: -150px;
-      left: -100px;
+      bottom: -80px;
+      left: -50px;
       animation-delay: 5s;
     }
 
     &.shape-3 {
-      width: 300px;
-      height: 300px;
+      width: 150px;
+      height: 150px;
       background: #ec4899;
-      top: 50%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
       animation-delay: 10s;
     }
   }
+
+  // Tablets - shapes más grandes
+  @include tablet {
+    .hero-shape {
+      opacity: 0.1;
+      filter: blur(60px);
+
+      &.shape-1 {
+        width: 400px;
+        height: 400px;
+        top: -80px;
+        right: -80px;
+      }
+
+      &.shape-2 {
+        width: 300px;
+        height: 300px;
+        bottom: -100px;
+        left: -80px;
+      }
+
+      &.shape-3 {
+        width: 250px;
+        height: 250px;
+      }
+    }
+  }
+
+  // Desktop
+  @include desktop {
+    .hero-shape {
+      &.shape-1 {
+        width: 500px;
+        height: 500px;
+        top: -100px;
+        right: -100px;
+      }
+
+      &.shape-2 {
+        width: 400px;
+        height: 400px;
+        bottom: -150px;
+        left: -100px;
+      }
+
+      &.shape-3 {
+        width: 300px;
+        height: 300px;
+      }
+    }
+  }
 }
 
-// Hero Content
+// HERO CONTENT - Mobile First (stack vertical)
 .hero-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  margin-bottom: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  margin-bottom: $spacing-xl;
+
+  // Tablets - Grid de 2 columnas
+  @include tablet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  // Desktop
+  @include desktop {
+    gap: 4rem;
+  }
 }
 
+// HERO TEXT
 .hero-text {
+  order: 1; // Texto primero en mobile
+
   .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: 50px;
     color: $primary-color;
-    font-size: 0.9rem;
+    font-size: $font-size-xs;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-sm;
 
     .badge-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       background: $primary-color;
       border-radius: 50%;
       animation: pulse 2s infinite;
@@ -99,11 +224,11 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
   }
 
   .hero-title {
-    font-size: 3.5rem;
+    font-size: $font-size-3xl;
     font-weight: 800;
     line-height: 1.2;
     color: #1e293b;
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-sm;
 
     .gradient-text {
       display: block;
@@ -112,38 +237,71 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    .rotating-text {
-      animation: fadeInOut 3s ease-in-out infinite;
-    }
   }
 
   .hero-description {
-    font-size: 1.2rem;
-    line-height: 1.8;
+    font-size: $font-size-base;
+    line-height: 1.6;
     color: #64748b;
-    margin-bottom: 2rem;
-    max-width: 600px;
+    margin-bottom: $spacing-md;
+  }
+
+  // Tablets
+  @include tablet {
+    .hero-badge {
+      padding: 0.5rem 1rem;
+      font-size: $font-size-sm;
+      margin-bottom: $spacing-md;
+
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+      }
+    }
+
+    .hero-title {
+      font-size: 2.8rem;
+      margin-bottom: $spacing-md;
+    }
+
+    .hero-description {
+      font-size: $font-size-lg;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  // Desktop
+  @include desktop {
+    .hero-title {
+      font-size: 3.5rem;
+    }
+
+    .hero-description {
+      font-size: $font-size-xl;
+    }
   }
 }
 
-// Buttons
+// BUTTONS - Mobile First
 .hero-buttons {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  flex-direction: column; // Stack en mobile
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
 
   .btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 1rem 2rem;
-    border-radius: 12px;
+    padding: 0.9rem 1.5rem;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: $font-size-sm;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: $transition-base;
     border: none;
+    width: 100%; // Full width en mobile
 
     &.btn-primary {
       background: $gradient;
@@ -151,7 +309,7 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 
       &:hover {
         transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
       }
 
       .icon-arrow {
@@ -168,10 +326,6 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       border: 2px solid #e2e8f0;
       color: #475569;
 
-      .icon-play {
-        font-size: 0.8rem;
-      }
-
       &:hover {
         border-color: $primary-color;
         color: $primary-color;
@@ -179,24 +333,36 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       }
     }
   }
+
+  // Tablets - Horizontal
+  @include tablet {
+    flex-direction: row;
+    gap: $spacing-md;
+
+    .btn {
+      width: auto;
+      padding: 1rem 2rem;
+      font-size: $font-size-base;
+    }
+  }
 }
 
-// Features
+// FEATURES - Mobile First
 .hero-features {
   display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: $spacing-sm;
 
   .feature-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     color: #64748b;
-    font-size: 0.95rem;
+    font-size: $font-size-sm;
 
     .feature-icon {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       background: rgba(99, 102, 241, 0.1);
       border-radius: 50%;
       display: flex;
@@ -204,158 +370,255 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       justify-content: center;
       color: $primary-color;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: $font-size-xs;
+      flex-shrink: 0;
+    }
+  }
+
+  // Tablets - Horizontal wrap
+  @include tablet {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $spacing-lg;
+
+    .feature-item {
+      font-size: $font-size-base;
+
+      .feature-icon {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 }
 
-// Hero Image
+// HERO IMAGE
 .hero-image {
   position: relative;
+  order: 2; // Imagen después del texto en mobile
 
   .image-container {
     position: relative;
     width: 100%;
-    height: 500px;
+    height: 300px;
   }
 
   .hero-main-image {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border-radius: 20px;
+    border-radius: 16px;
     border: 2px solid rgba(99, 102, 241, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
 
     .image-placeholder {
-      font-size: 8rem;
+      font-size: 4rem;
       opacity: 0.3;
     }
   }
 
   .floating-card {
-    position: absolute;
-    background: white;
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    animation: floatCard 3s infinite ease-in-out;
+    display: none; // Ocultar cards flotantes en mobile para no saturar
+  }
 
-    .card-icon {
-      font-size: 2rem;
+  // Tablets
+  @include tablet {
+    .image-container {
+      height: 400px;
     }
 
-    .card-content {
-      .card-title {
-        font-size: 0.85rem;
-        color: #64748b;
-        margin: 0;
-      }
+    .hero-main-image {
+      border-radius: 20px;
 
-      .card-value {
+      .image-placeholder {
+        font-size: 6rem;
+      }
+    }
+
+    .floating-card {
+      display: flex;
+      position: absolute;
+      background: white;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      align-items: center;
+      gap: 0.8rem;
+      animation: floatCard 3s infinite ease-in-out;
+
+      .card-icon {
         font-size: 1.5rem;
-        font-weight: 700;
-        color: $primary-color;
-        margin: 0;
+      }
+
+      .card-content {
+        .card-title {
+          font-size: $font-size-xs;
+          color: #64748b;
+          margin: 0;
+        }
+
+        .card-value {
+          font-size: $font-size-lg;
+          font-weight: 700;
+          color: $primary-color;
+          margin: 0;
+        }
+      }
+
+      &.card-1 {
+        top: 10%;
+        right: -5%;
+        animation-delay: 0s;
+      }
+
+      &.card-2 {
+        bottom: 30%;
+        left: -8%;
+        animation-delay: 1s;
+      }
+
+      &.card-3 {
+        bottom: 10%;
+        right: 5%;
+        animation-delay: 2s;
+      }
+    }
+  }
+
+  // Desktop
+  @include desktop {
+    .image-container {
+      height: 500px;
+    }
+
+    .hero-main-image {
+      .image-placeholder {
+        font-size: 8rem;
       }
     }
 
-    &.card-1 {
-      top: 10%;
-      right: 5%;
-      animation-delay: 0s;
-    }
+    .floating-card {
+      padding: 1rem 1.5rem;
 
-    &.card-2 {
-      bottom: 30%;
-      left: -10%;
-      animation-delay: 1s;
-    }
+      .card-icon {
+        font-size: 2rem;
+      }
 
-    &.card-3 {
-      bottom: 10%;
-      right: 10%;
-      animation-delay: 2s;
+      .card-content {
+        .card-title {
+          font-size: $font-size-sm;
+        }
+
+        .card-value {
+          font-size: $font-size-2xl;
+        }
+      }
+
+      &.card-2 {
+        left: -10%;
+      }
+
+      &.card-3 {
+        right: 10%;
+      }
     }
   }
 }
 
-// Stats
+// STATS - Mobile First (2 columnas)
 .hero-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-  padding: 3rem 0;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+  padding: $spacing-lg 0;
   border-top: 1px solid #e2e8f0;
 
   .stat-item {
     text-align: center;
 
     .stat-number {
-      font-size: 2.5rem;
+      font-size: $font-size-3xl;
       font-weight: 800;
       background: $gradient;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 0.3rem 0;
     }
 
     .stat-label {
       color: #64748b;
-      font-size: 0.95rem;
+      font-size: $font-size-xs;
+      margin: 0;
+    }
+  }
+
+  // Tablets - 4 columnas
+  @include tablet {
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-lg;
+    padding: 3rem 0;
+
+    .stat-item {
+      .stat-number {
+        font-size: 2.5rem;
+      }
+
+      .stat-label {
+        font-size: $font-size-sm;
+      }
+    }
+  }
+}
+
+// SCROLL INDICATOR - Solo desktop
+.scroll-indicator {
+  display: none;
+
+  @include desktop {
+    display: flex;
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.6;
+
+    .mouse {
+      width: 30px;
+      height: 50px;
+      border: 2px solid $primary-color;
+      border-radius: 15px;
+      position: relative;
+
+      .wheel {
+        width: 4px;
+        height: 10px;
+        background: $primary-color;
+        border-radius: 2px;
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: scroll 2s infinite;
+      }
+    }
+
+    p {
+      font-size: $font-size-sm;
+      color: #64748b;
       margin: 0;
     }
   }
 }
 
-// Scroll Indicator
-.scroll-indicator {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.6;
-
-  .mouse {
-    width: 30px;
-    height: 50px;
-    border: 2px solid $primary-color;
-    border-radius: 15px;
-    position: relative;
-
-    .wheel {
-      width: 4px;
-      height: 10px;
-      background: $primary-color;
-      border-radius: 2px;
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation: scroll 2s infinite;
-    }
-  }
-
-  p {
-    font-size: 0.85rem;
-    color: #64748b;
-    margin: 0;
-  }
-}
-
-// Animations
+// ANIMATIONS
 @keyframes float {
   0%, 100% {
     transform: translateY(0) rotate(0deg);
@@ -393,67 +656,5 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
   100% {
     opacity: 0;
     transform: translateX(-50%) translateY(20px);
-  }
-}
-
-@keyframes fadeInOut {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .hero-section {
-    padding: 100px 0 60px;
-  }
-
-  .hero-content {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-
-  .hero-text {
-    .hero-title {
-      font-size: 2.5rem;
-    }
-
-    .hero-description {
-      font-size: 1rem;
-    }
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  .hero-image {
-    .image-container {
-      height: 400px;
-    }
-
-    .floating-card {
-      &.card-2 {
-        left: 5%;
-      }
-    }
-  }
-
-  .hero-stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-
-  .hero-features {
-    flex-direction: column;
-    gap: 1rem;
   }
 }

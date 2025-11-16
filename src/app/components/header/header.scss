@@ -1,11 +1,50 @@
-// Variables
+// ============================================
+// HEADER COMPONENT - MOBILE FIRST
+// ============================================
+
+// Variables locales del componente
 $primary-color: #6366f1;
 $secondary-color: #8b5cf6;
-$dark-bg: #1e293b;
-$light-text: #f1f5f9;
-$border-color: #e2e8f0;
+$gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 
-// Header
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+// Mixins
+@mixin phone-large {
+  @media (min-width: $breakpoint-sm) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) { @content; }
+}
+
+// Espaciado
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Tipografía
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 2rem;
+
+// Transiciones
+$transition-base: all 0.3s ease;
+
+// BASE STYLES (Mobile ≤ 480px)
 .header {
   position: fixed;
   top: 0;
@@ -13,14 +52,13 @@ $border-color: #e2e8f0;
   right: 0;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   z-index: 1000;
-  padding: 1rem 0;
+  padding: $spacing-sm 0;
 
   .container {
-    max-width: 1200px;
+    padding: 0 $spacing-sm;
     margin: 0 auto;
-    padding: 0 2rem;
   }
 
   .header-content {
@@ -28,77 +66,147 @@ $border-color: #e2e8f0;
     justify-content: space-between;
     align-items: center;
   }
+
+  // Tablets
+  @include tablet {
+    padding: $spacing-sm 0;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+
+    .container {
+      padding: 0 $spacing-lg;
+      max-width: 1200px;
+    }
+  }
 }
 
-// Logo
+// LOGO - Mobile First
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.5rem;
+  gap: 0.4rem;
+  font-size: $font-size-xl;
   font-weight: 700;
   color: $primary-color;
   cursor: pointer;
 
   .icon-graduation::before {
     content: "🎓";
-    font-size: 1.8rem;
+    font-size: 1.4rem;
   }
 
   .logo-text {
-    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    background: $gradient;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
+  // Tablets y superiores
+  @include tablet {
+    gap: 0.5rem;
+    font-size: $font-size-2xl;
+
+    .icon-graduation::before {
+      font-size: 1.8rem;
+    }
+  }
 }
 
-// Navigation
+// NAVIGATION - Mobile First (hamburger menu)
 .nav {
-  display: flex;
-  gap: 2rem;
+  display: none; // Oculto por defecto en mobile
+
+  // Menú móvil activo
+  &.active {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: $spacing-lg $spacing-sm;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    animation: slideDown 0.3s ease;
+  }
 
   .nav-link {
     color: #64748b;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    font-size: $font-size-base;
+    transition: $transition-base;
+    padding: $spacing-sm 0;
     position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: $primary-color;
-      transition: width 0.3s ease;
-    }
 
     &:hover {
       color: $primary-color;
-      
+    }
+  }
+
+  // Tablets y superiores - Menú horizontal
+  @include tablet {
+    display: flex !important;
+    flex-direction: row;
+    gap: $spacing-lg;
+    position: static;
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+
+    .nav-link {
+      padding: 0;
+
       &::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: $primary-color;
+        transition: width 0.3s ease;
+      }
+
+      &:hover::after {
         width: 100%;
       }
     }
   }
 }
 
-// Auth Buttons
+// AUTH BUTTONS - Mobile First
 .auth-buttons {
-  display: flex;
-  gap: 1rem;
+  display: none; // Ocultos por defecto en mobile
+
+  &.active {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+    width: 100%;
+  }
+
+  // Tablets y superiores
+  @include tablet {
+    display: flex !important;
+    flex-direction: row;
+    gap: $spacing-sm;
+    margin-top: 0;
+    width: auto;
+  }
 }
 
+// BUTTONS - Mobile First
 .btn {
-  padding: 0.6rem 1.5rem;
+  padding: 0.6rem 1rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: $transition-base;
   border: none;
-  font-size: 0.95rem;
+  font-size: $font-size-sm;
+  text-align: center;
 
   &.btn-outline {
     background: transparent;
@@ -112,13 +220,12 @@ $border-color: #e2e8f0;
   }
 
   &.btn-primary {
-    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    background: $gradient;
     color: white;
-    border: none;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
     }
   }
 
@@ -126,27 +233,54 @@ $border-color: #e2e8f0;
     width: 100%;
     padding: 0.8rem;
   }
+
+  // Tablets y superiores
+  @include tablet {
+    padding: 0.6rem 1.5rem;
+    font-size: $font-size-base;
+  }
 }
 
-// Mobile Menu Toggle
+// MOBILE MENU TOGGLE - Solo visible en mobile
 .menu-toggle {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 5px;
   background: none;
   border: none;
   cursor: pointer;
+  padding: $spacing-xs;
 
   span {
     width: 25px;
     height: 3px;
     background: $primary-color;
     border-radius: 3px;
-    transition: all 0.3s ease;
+    transition: $transition-base;
+  }
+
+  // Animación cuando está activo
+  &.active {
+    span:nth-child(1) {
+      transform: rotate(45deg) translateY(8px);
+    }
+
+    span:nth-child(2) {
+      opacity: 0;
+    }
+
+    span:nth-child(3) {
+      transform: rotate(-45deg) translateY(-8px);
+    }
+  }
+
+  // Tablets y superiores - Ocultar hamburger
+  @include tablet {
+    display: none;
   }
 }
 
-// Modal
+// MODAL - Mobile First
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -156,66 +290,98 @@ $border-color: #e2e8f0;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end; // Bottom sheet en mobile
   z-index: 2000;
   animation: fadeIn 0.3s ease;
+  padding: 0;
+
+  // Tablets y superiores
+  @include tablet {
+    align-items: center;
+    padding: $spacing-lg;
+  }
 }
 
 .modal-content {
   background: white;
-  border-radius: 20px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
+  border-radius: 20px 20px 0 0; // Solo arriba en mobile
+  width: 100%;
+  max-height: 85vh;
   overflow-y: auto;
   position: relative;
-  animation: slideUp 0.3s ease;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUpMobile 0.3s ease;
+
+  // Tablets y superiores
+  @include tablet {
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    animation: slideUp 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
 }
 
 .modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.8rem;
+  right: 0.8rem;
   background: #f1f5f9;
   border: none;
-  width: 35px;
-  height: 35px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: $transition-base;
   color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background: #e2e8f0;
     transform: rotate(90deg);
   }
+
+  // Tablets y superiores
+  @include tablet {
+    top: 1rem;
+    right: 1rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1.5rem;
+  }
 }
 
-// Auth Container
+// AUTH CONTAINER - Mobile First
 .auth-container {
-  padding: 2rem;
+  padding: $spacing-lg $spacing-sm;
+
+  // Tablets
+  @include tablet {
+    padding: $spacing-lg;
+  }
 }
 
 .auth-tabs {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0;
+  margin-bottom: $spacing-lg;
   border-bottom: 2px solid #e2e8f0;
 }
 
 .auth-tab {
   flex: 1;
-  padding: 1rem;
+  padding: $spacing-sm;
   background: none;
   border: none;
-  font-size: 1rem;
+  font-size: $font-size-sm;
   font-weight: 600;
   color: #64748b;
   cursor: pointer;
   position: relative;
-  transition: color 0.3s ease;
+  transition: $transition-base;
 
   &.active {
     color: $primary-color;
@@ -230,11 +396,18 @@ $border-color: #e2e8f0;
       background: $primary-color;
     }
   }
+
+  // Tablets
+  @include tablet {
+    padding: $spacing-md;
+    font-size: $font-size-base;
+  }
 }
 
+// AUTH FORM - Mobile First
 .auth-form {
   .auth-title {
-    font-size: 1.8rem;
+    font-size: $font-size-2xl;
     font-weight: 700;
     color: #1e293b;
     margin-bottom: 0.5rem;
@@ -242,33 +415,34 @@ $border-color: #e2e8f0;
 
   .auth-subtitle {
     color: #64748b;
-    margin-bottom: 2rem;
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-lg;
   }
 
   .form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr; // Una columna en mobile
+    gap: $spacing-sm;
   }
 
   .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: $spacing-md;
 
     label {
       display: block;
-      margin-bottom: 0.5rem;
+      margin-bottom: $spacing-xs;
       font-weight: 600;
       color: #475569;
-      font-size: 0.9rem;
+      font-size: $font-size-sm;
     }
 
     .form-control {
       width: 100%;
-      padding: 0.8rem;
+      padding: 0.75rem;
       border: 2px solid #e2e8f0;
       border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
+      font-size: $font-size-base;
+      transition: $transition-base;
       box-sizing: border-box;
 
       &:focus {
@@ -277,17 +451,13 @@ $border-color: #e2e8f0;
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
       }
     }
-
-    select.form-control {
-      cursor: pointer;
-    }
   }
 
   .form-options {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    flex-direction: column; // Stack en mobile
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
   }
 
   .checkbox {
@@ -295,7 +465,7 @@ $border-color: #e2e8f0;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: $font-size-sm;
     color: #64748b;
 
     input[type="checkbox"] {
@@ -316,8 +486,9 @@ $border-color: #e2e8f0;
   .forgot-link {
     color: $primary-color;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: $font-size-sm;
     font-weight: 600;
+    text-align: right;
 
     &:hover {
       text-decoration: underline;
@@ -327,7 +498,7 @@ $border-color: #e2e8f0;
   .divider {
     position: relative;
     text-align: center;
-    margin: 1.5rem 0;
+    margin: $spacing-md 0;
 
     &::before {
       content: '';
@@ -342,16 +513,16 @@ $border-color: #e2e8f0;
     span {
       position: relative;
       background: white;
-      padding: 0 1rem;
+      padding: 0 $spacing-sm;
       color: #94a3b8;
-      font-size: 0.9rem;
+      font-size: $font-size-sm;
     }
   }
 
   .social-buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr; // Una columna en mobile
+    gap: $spacing-sm;
 
     .btn-social {
       display: flex;
@@ -364,7 +535,8 @@ $border-color: #e2e8f0;
       color: #64748b;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: $transition-base;
+      font-size: $font-size-sm;
 
       &:hover {
         border-color: $primary-color;
@@ -385,15 +557,53 @@ $border-color: #e2e8f0;
       }
     }
   }
+
+  // Tablets - 2 columnas en form-row y social-buttons
+  @include tablet {
+    .auth-title {
+      font-size: $font-size-3xl;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+      gap: $spacing-md;
+    }
+
+    .form-options {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .social-buttons {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }
 
-// Animations
+// ANIMATIONS
 @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
   from {
     opacity: 0;
+    transform: translateY(-20px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 
@@ -405,46 +615,5 @@ $border-color: #e2e8f0;
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .nav {
-    display: none;
-    
-    &.active {
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 1rem 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  .auth-buttons {
-    display: none;
-    
-    &.active {
-      display: flex;
-    }
-  }
-
-  .menu-toggle {
-    display: flex;
-  }
-
-  .auth-form {
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .social-buttons {
-      grid-template-columns: 1fr;
-    }
   }
 }

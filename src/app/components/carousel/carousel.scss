@@ -1,131 +1,273 @@
-// Variables
+// ============================================
+// CAROUSEL COMPONENT - MOBILE FIRST
+// ============================================
+
+// Variables locales del componente
 $primary-color: #6366f1;
 $secondary-color: #8b5cf6;
 $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+
+// Mixins
+@mixin phone-large {
+  @media (min-width: $breakpoint-sm) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) { @content; }
+}
+
+// Espaciado
+$spacing-xs: 0.5rem;
+$spacing-sm: 1rem;
+$spacing-md: 1.5rem;
+$spacing-lg: 2rem;
+$spacing-xl: 3rem;
+
+// Tipografía
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 2rem;
+$font-size-4xl: 2.5rem;
+
+// Transiciones
+$transition-base: all 0.3s ease;
+
+// BASE STYLES (Mobile ≤ 480px)
 .carousel-section {
-  padding: 80px 0;
+  padding: $spacing-xl 0;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   position: relative;
 
   .container {
-    max-width: 1200px;
+    padding: 0 $spacing-sm;
     margin: 0 auto;
-    padding: 0 2rem;
+  }
+
+  // Tablets
+  @include tablet {
+    padding: 60px 0;
+
+    .container {
+      padding: 0 $spacing-lg;
+    }
+  }
+
+  // Desktop
+  @include desktop {
+    padding: 80px 0;
+
+    .container {
+      max-width: 1200px;
+    }
   }
 }
 
-// Section Header
+// SECTION HEADER
 .section-header {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: $spacing-xl;
 
   .section-badge {
     display: inline-block;
-    padding: 0.5rem 1.5rem;
+    padding: 0.4rem 1rem;
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: 50px;
     color: $primary-color;
-    font-size: 0.9rem;
+    font-size: $font-size-xs;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-sm;
   }
 
   .section-title {
-    font-size: 2.5rem;
+    font-size: $font-size-3xl;
     font-weight: 800;
     color: #1e293b;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-sm;
+    line-height: 1.2;
   }
 
   .section-description {
-    font-size: 1.1rem;
+    font-size: $font-size-sm;
     color: #64748b;
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto;
-  }
-}
-
-// Carousel Container
-.carousel-container {
-  position: relative;
-  padding: 2rem 0;
-}
-
-.carousel-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
-  background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 10;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-  .nav-icon {
-    font-size: 2rem;
-    color: #64748b;
-    font-style: normal;
+    padding: 0 $spacing-sm;
   }
 
-  &:hover {
-    background: $gradient;
-    border-color: transparent;
-    transform: translateY(-50%) scale(1.1);
+  // Tablets
+  @include tablet {
+    margin-bottom: 3rem;
 
-    .nav-icon {
-      color: white;
+    .section-badge {
+      padding: 0.5rem 1.5rem;
+      font-size: $font-size-sm;
+      margin-bottom: $spacing-md;
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+    }
+
+    .section-description {
+      font-size: $font-size-base;
+      max-width: 600px;
     }
   }
 
-  &.prev {
-    left: -25px;
-  }
+  // Desktop
+  @include desktop {
+    margin-bottom: 4rem;
 
-  &.next {
-    right: -25px;
+    .section-title {
+      font-size: $font-size-4xl;
+    }
+
+    .section-description {
+      font-size: $font-size-lg;
+    }
   }
 }
 
-// Carousel Track
+// CAROUSEL CONTAINER
+.carousel-container {
+  position: relative;
+  padding: $spacing-md 0;
+}
+
+// CAROUSEL NAVIGATION - Ocultar en mobile, mostrar en tablets+
+.carousel-nav {
+  display: none;
+
+  @include tablet {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: $transition-base;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+    .nav-icon {
+      font-size: 1.5rem;
+      color: #64748b;
+      font-style: normal;
+    }
+
+    &:hover {
+      background: $gradient;
+      border-color: transparent;
+      transform: translateY(-50%) scale(1.1);
+
+      .nav-icon {
+        color: white;
+      }
+    }
+
+    &.prev {
+      left: -15px;
+    }
+
+    &.next {
+      right: -15px;
+    }
+  }
+
+  @include desktop {
+    width: 50px;
+    height: 50px;
+
+    .nav-icon {
+      font-size: 2rem;
+    }
+
+    &.prev {
+      left: -25px;
+    }
+
+    &.next {
+      right: -25px;
+    }
+  }
+}
+
+// CAROUSEL TRACK
 .carousel-track {
   overflow: hidden;
-  padding: 1rem 0;
+  padding: $spacing-sm 0;
+
+  @include tablet {
+    padding: $spacing-md 0;
+  }
 }
 
 .carousel-cards {
   display: flex;
-  gap: 2rem;
+  gap: $spacing-md;
   transition: transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+  
+  // En mobile, permitir scroll horizontal
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE/Edge
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome/Safari
+  }
+
+  @include tablet {
+    gap: $spacing-lg;
+    overflow-x: visible;
+  }
+
+  @include desktop {
+    gap: 2rem;
+  }
 }
 
-// Event Card
+// EVENT CARD - Mobile First
 .event-card {
-  min-width: 340px;
+  min-width: 280px; // Ancho mínimo para mobile
+  max-width: 280px;
   background: white;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: $transition-base;
   display: flex;
   flex-direction: column;
+  scroll-snap-align: start; // Para scroll mobile
 
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
   }
 
   .card-header {
     position: relative;
-    height: 200px;
+    height: 160px;
     background: $gradient;
     overflow: hidden;
 
@@ -137,18 +279,18 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       position: relative;
 
       .event-emoji {
-        font-size: 5rem;
+        font-size: 3.5rem;
         filter: brightness(1.2);
       }
 
       .card-category {
         position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.4rem 1rem;
+        top: 0.8rem;
+        right: 0.8rem;
+        padding: 0.3rem 0.8rem;
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
-        font-size: 0.85rem;
+        font-size: $font-size-xs;
         font-weight: 600;
         color: $primary-color;
       }
@@ -156,104 +298,107 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
   }
 
   .card-body {
-    padding: 1.5rem;
+    padding: $spacing-md;
     flex: 1;
+    display: flex;
+    flex-direction: column;
 
     .card-university {
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
-      padding: 0.3rem 0.8rem;
+      padding: 0.25rem 0.6rem;
       background: #f1f5f9;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: $font-size-xs;
       font-weight: 600;
       color: #64748b;
-      margin-bottom: 1rem;
-
-      .uni-icon {
-        font-size: 1rem;
-      }
+      margin-bottom: $spacing-sm;
+      align-self: flex-start;
     }
 
     .card-title {
-      font-size: 1.3rem;
+      font-size: $font-size-lg;
       font-weight: 700;
       color: #1e293b;
-      margin-bottom: 0.8rem;
+      margin-bottom: $spacing-xs;
       line-height: 1.3;
-      min-height: 50px;
+      min-height: 48px;
     }
 
     .card-description {
       color: #64748b;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
+      font-size: $font-size-sm;
+      line-height: 1.5;
+      margin-bottom: $spacing-md;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      min-height: 70px;
+      min-height: 42px;
     }
 
     .card-info {
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
+      gap: 0.6rem;
+      margin-top: auto;
 
       .info-item {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         color: #64748b;
-        font-size: 0.9rem;
+        font-size: $font-size-xs;
 
         .info-icon {
-          font-size: 1rem;
+          font-size: $font-size-sm;
+          flex-shrink: 0;
         }
       }
     }
   }
 
   .card-footer {
-    padding: 1rem 1.5rem;
+    padding: $spacing-sm $spacing-md;
     border-top: 1px solid #e2e8f0;
     display: flex;
-    gap: 0.8rem;
+    gap: 0.6rem;
 
     .btn-card {
       flex: 1;
-      padding: 0.7rem 1.5rem;
+      padding: 0.6rem 1rem;
       background: $gradient;
       color: white;
       border: none;
       border-radius: 8px;
       font-weight: 600;
+      font-size: $font-size-xs;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.3s ease;
+      gap: 0.4rem;
+      transition: $transition-base;
 
       .arrow-icon {
         transition: transform 0.3s ease;
+        font-size: $font-size-sm;
       }
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
 
         .arrow-icon {
-          transform: translateX(5px);
+          transform: translateX(3px);
         }
       }
     }
 
     .btn-icon {
-      width: 45px;
-      height: 45px;
+      width: 38px;
+      height: 38px;
       background: #f1f5f9;
       border: none;
       border-radius: 8px;
@@ -261,10 +406,11 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: $transition-base;
+      flex-shrink: 0;
 
       i {
-        font-size: 1.2rem;
+        font-size: 1rem;
         filter: grayscale(100%);
         transition: filter 0.3s ease;
       }
@@ -278,105 +424,11 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       }
     }
   }
-}
 
-// Dots Indicator
-.carousel-dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.8rem;
-  margin-top: 2rem;
-
-  .dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #cbd5e1;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0;
-
-    &.active {
-      width: 40px;
-      border-radius: 6px;
-      background: $gradient;
-    }
-
-    &:hover:not(.active) {
-      background: #94a3b8;
-      transform: scale(1.2);
-    }
-  }
-}
-
-// Carousel Footer
-.carousel-footer {
-  text-align: center;
-  margin-top: 3rem;
-
-  .btn-outline-large {
-    padding: 1rem 2.5rem;
-    background: white;
-    border: 2px solid #e2e8f0;
-    color: #475569;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    transition: all 0.3s ease;
-
-    .icon {
-      transition: transform 0.3s ease;
-    }
-
-    &:hover {
-      border-color: $primary-color;
-      color: $primary-color;
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-
-      .icon {
-        transform: translateX(5px);
-      }
-    }
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .section-header {
-    .section-title {
-      font-size: 2rem;
-    }
-  }
-
-  .carousel-nav {
-    width: 40px;
-    height: 40px;
-
-    .nav-icon {
-      font-size: 1.5rem;
-    }
-
-    &.prev {
-      left: -15px;
-    }
-
-    &.next {
-      right: -15px;
-    }
-  }
-
-  .carousel-cards {
-    gap: 1rem;
-  }
-
-  .event-card {
+  // Teléfonos grandes
+  @include phone-large {
     min-width: 300px;
+    max-width: 300px;
 
     .card-header {
       height: 180px;
@@ -386,32 +438,204 @@ $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
       }
     }
 
-    .card-body .card-title {
-      font-size: 1.1rem;
+    .card-body {
+      .card-title {
+        font-size: $font-size-xl;
+      }
+
+      .card-description {
+        font-size: $font-size-base;
+        -webkit-line-clamp: 3;
+        min-height: 60px;
+      }
+
+      .card-info .info-item {
+        font-size: $font-size-sm;
+      }
+    }
+
+    .card-footer {
+      .btn-card {
+        font-size: $font-size-sm;
+      }
+
+      .btn-icon {
+        width: 42px;
+        height: 42px;
+      }
     }
   }
 
-  .carousel-dots {
-    gap: 0.5rem;
+  // Tablets
+  @include tablet {
+    min-width: 320px;
+    max-width: 320px;
+
+    .card-body {
+      padding: $spacing-lg;
+
+      .card-title {
+        min-height: 50px;
+      }
+
+      .card-description {
+        min-height: 70px;
+      }
+
+      .card-info {
+        gap: 0.8rem;
+      }
+    }
+
+    .card-footer {
+      padding: $spacing-md $spacing-lg;
+      gap: 0.8rem;
+
+      .btn-icon {
+        width: 45px;
+        height: 45px;
+
+        i {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+
+  // Desktop
+  @include desktop {
+    min-width: 340px;
+    max-width: 340px;
+
+    .card-header {
+      height: 200px;
+
+      .card-image .event-emoji {
+        font-size: 5rem;
+      }
+    }
+
+    .card-body .card-title {
+      font-size: $font-size-2xl;
+    }
+  }
+}
+
+// DOTS INDICATOR
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: $spacing-md;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    border: none;
+    cursor: pointer;
+    transition: $transition-base;
+    padding: 0;
+
+    &.active {
+      width: 24px;
+      border-radius: 4px;
+      background: $gradient;
+    }
+
+    &:hover:not(.active) {
+      background: #94a3b8;
+      transform: scale(1.2);
+    }
+  }
+
+  @include tablet {
+    gap: 0.6rem;
+    margin-top: $spacing-lg;
 
     .dot {
       width: 10px;
       height: 10px;
 
       &.active {
-        width: 30px;
+        width: 32px;
+        border-radius: 5px;
+      }
+    }
+  }
+
+  @include desktop {
+    gap: 0.8rem;
+    margin-top: 2rem;
+
+    .dot {
+      width: 12px;
+      height: 12px;
+
+      &.active {
+        width: 40px;
+        border-radius: 6px;
       }
     }
   }
 }
 
-@media (max-width: 480px) {
-  .event-card {
-    min-width: 280px;
+// CAROUSEL FOOTER
+.carousel-footer {
+  text-align: center;
+  margin-top: $spacing-lg;
+  padding: 0 $spacing-sm;
+
+  .btn-outline-large {
+    width: 100%; // Full width en mobile
+    padding: 0.9rem 1.5rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: $transition-base;
+
+    .icon {
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      border-color: $primary-color;
+      color: $primary-color;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+
+      .icon {
+        transform: translateX(5px);
+      }
+    }
   }
 
-  .carousel-footer .btn-outline-large {
-    width: 100%;
-    justify-content: center;
+  @include tablet {
+    margin-top: $spacing-xl;
+
+    .btn-outline-large {
+      width: auto;
+      padding: 1rem 2rem;
+      font-size: $font-size-base;
+    }
+  }
+
+  @include desktop {
+    margin-top: 3rem;
+
+    .btn-outline-large {
+      padding: 1rem 2.5rem;
+      font-size: $font-size-lg;
+      gap: 0.8rem;
+    }
   }
 }
