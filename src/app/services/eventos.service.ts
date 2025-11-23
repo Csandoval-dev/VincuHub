@@ -13,45 +13,46 @@ import {
   query,
   where,
   orderBy,
-  collectionData,
-  docData,
   Timestamp
 } from '@angular/fire/firestore';
-import { 
-  Storage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject
-} from '@angular/fire/storage';
 import { Observable, from, map } from 'rxjs';
 import { Evento, CreateEventoData, EventoEstado } from '../models/evento.model';
 import { AuthService } from './auth.service';
+import { ImageCompressor } from '../utils/image-compressor';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventosService {
   private firestore = inject(Firestore);
-  private storage = inject(Storage);
   private authService = inject(AuthService);
 
   private eventosCollection = collection(this.firestore, 'eventos');
 
-  // Crear evento
+  // Crear evento con imagen Base64
   async crearEvento(data: CreateEventoData, imagenFile?: File): Promise<string> {
     const user = await this.authService.getCurrentUser();
     if (!user) throw new Error('Usuario no autenticado');
 
-    let imagenUrl = '';
+    let imagenUrl = data.imagenUrl || '';
     
-    // Subir imagen si existe
+    // Comprimir y convertir imagen a Base64
     if (imagenFile) {
-      const timestamp = Date.now();
-      const imagePath = `eventos/${timestamp}_${imagenFile.name}`;
-      const storageRef = ref(this.storage, imagePath);
-      await uploadBytes(storageRef, imagenFile);
-      imagenUrl = await getDownloadURL(storageRef);
+      console.log('📸 Procesando imagen...');
+      
+      // Validar tipo de archivo
+      if (!ImageCompressor.isValidImageFile(imagenFile)) {
+        throw new Error('El archivo debe ser una imagen (JPG, PNG, WEBP)');
+      }
+      
+      // Validar tamaño máximo del archivo original (10MB)
+      if (!ImageCompressor.isValidFileSize(imagenFile, 10)) {
+        throw new Error('La imagen no debe superar 10MB');
+      }
+      
+      // Comprimir imagen a máximo 400KB
+      imagenUrl = await ImageCompressor.compressImage(imagenFile, 400, 0.8);
+      console.log('✅ Imagen procesada correctamente');
     }
 
     const nuevoEvento: Evento = {
@@ -80,41 +81,66 @@ export class EventosService {
     return docRef.id;
   }
 
-  // Obtener eventos del coordinador
+  // ✅ CORREGIDO: Obtener eventos del coordinador
   getEventosByCoordinador(coordinadorUid: string): Observable<Evento[]> {
-    const q = query(
-      this.eventosCollection,
-      where('creadorUid', '==', coordinadorUid),
-      orderBy('fecha', 'desc')
-    );
-
-    return collectionData(q, { idField: 'eventoId' }).pipe(
-      map((eventos: any[]) => eventos.map(e => this.convertTimestamps(e)))
+    const firestore = this.firestore; // Guardar referencia
+    
+    return from(
+      (async () => {
+        const q = query(
+          collection(firestore, 'eventos'),
+          where('creadorUid', '==', coordinadorUid),
+          orderBy('fecha', 'desc')
+        );
+        
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => {
+          const data = doc.data();
+          return this.convertTimestamps({
+            ...data,
+            eventoId: doc.id
+          });
+        });
+      })()
     );
   }
 
-  // Obtener todos los eventos (para estudiantes)
+  // ✅ CORREGIDO: Obtener todos los eventos (para estudiantes)
   getEventosPublicados(campus?: string): Observable<Evento[]> {
-    let q = query(
-      this.eventosCollection,
-      where('estado', '==', 'publicado'),
-      orderBy('fecha', 'asc')
-    );
+    const firestore = this.firestore; // Guardar referencia
+    
+    return from(
+      (async () => {
+        let q = query(
+          collection(firestore, 'eventos'),
+          where('estado', '==', 'publicado'),
+          orderBy('fecha', 'asc')
+        );
 
-    if (campus) {
-      q = query(q, where('campus', '==', campus));
-    }
+        if (campus) {
+          q = query(q, where('campus', '==', campus));
+        }
 
-    return collectionData(q, { idField: 'eventoId' }).pipe(
-      map((eventos: any[]) => eventos.map(e => this.convertTimestamps(e)))
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => {
+          const data = doc.data();
+          return this.convertTimestamps({
+            ...data,
+            eventoId: doc.id
+          });
+        });
+      })()
     );
   }
 
   // Obtener evento por ID
   getEventoById(eventoId: string): Observable<Evento | null> {
     const docRef = doc(this.firestore, `eventos/${eventoId}`);
-    return docData(docRef, { idField: 'eventoId' }).pipe(
-      map((evento: any) => evento ? this.convertTimestamps(evento) : null)
+    return from(getDoc(docRef)).pipe(
+      map(docSnap => {
+        if (!docSnap.exists()) return null;
+        return this.convertTimestamps({ ...docSnap.data(), eventoId: docSnap.id });
+      })
     );
   }
 
@@ -129,25 +155,19 @@ export class EventosService {
 
     // Si hay nueva imagen
     if (imagenFile) {
-      // Eliminar imagen anterior si existe
-      const eventoActual = await getDoc(docRef);
-      const eventoData = eventoActual.data() as Evento;
+      console.log('📸 Procesando nueva imagen...');
       
-      if (eventoData.imagenUrl) {
-        try {
-          const oldImageRef = ref(this.storage, eventoData.imagenUrl);
-          await deleteObject(oldImageRef);
-        } catch (error) {
-          console.warn('No se pudo eliminar la imagen anterior:', error);
-        }
+      // Validar y comprimir
+      if (!ImageCompressor.isValidImageFile(imagenFile)) {
+        throw new Error('El archivo debe ser una imagen');
       }
-
-      // Subir nueva imagen
-      const timestamp = Date.now();
-      const imagePath = `eventos/${timestamp}_${imagenFile.name}`;
-      const storageRef = ref(this.storage, imagePath);
-      await uploadBytes(storageRef, imagenFile);
-      updateData.imagenUrl = await getDownloadURL(storageRef);
+      
+      if (!ImageCompressor.isValidFileSize(imagenFile, 10)) {
+        throw new Error('La imagen no debe superar 10MB');
+      }
+      
+      updateData.imagenUrl = await ImageCompressor.compressImage(imagenFile, 400, 0.8);
+      console.log('✅ Nueva imagen procesada');
     }
 
     // Convertir fecha si existe
@@ -210,9 +230,9 @@ export class EventosService {
   private convertTimestamps(evento: any): Evento {
     return {
       ...evento,
-      fecha: evento.fecha?.toDate ? evento.fecha.toDate() : evento.fecha,
-      createdAt: evento.createdAt?.toDate ? evento.createdAt.toDate() : evento.createdAt,
-      updatedAt: evento.updatedAt?.toDate ? evento.updatedAt.toDate() : evento.updatedAt
+      fecha: evento.fecha?.toDate ? evento.fecha.toDate() : new Date(evento.fecha),
+      createdAt: evento.createdAt?.toDate ? evento.createdAt.toDate() : new Date(evento.createdAt),
+      updatedAt: evento.updatedAt?.toDate ? evento.updatedAt.toDate() : new Date(evento.updatedAt)
     };
   }
 }

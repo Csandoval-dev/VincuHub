@@ -1,4 +1,3 @@
-
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { 
@@ -16,13 +15,11 @@ import {
   doc, 
   setDoc, 
   getDoc,
-  docData,
-   query,           // ⬅️ AGREGAR
-  where,           // ⬅️ AGREGAR
-  getDocs,         // ⬅️ AGREGAR
+  query,
+  where,
+  getDocs,
   deleteDoc,
-  collection,
-  collectionData
+  collection
 } from '@angular/fire/firestore';
 import { Observable, from, of, switchMap, tap, catchError } from 'rxjs';
 import { User, UserRole, CreateUserData } from '../models/user.model';
@@ -37,11 +34,9 @@ export class AuthService {
 
   constructor() {
     console.log('🔥 AuthService inicializado');
-    console.log('🔥 Firebase Auth:', this.auth);
-    console.log('🔥 Firestore:', this.firestore);
   }
 
-  // Observable del usuario autenticado
+  // ✅ SOLUCIÓN: Observable del usuario con getDoc en lugar de docData
   currentUser$: Observable<User | null> = authState(this.auth).pipe(
     tap(user => console.log('🔵 Estado de autenticación:', user?.uid || 'No autenticado')),
     switchMap((firebaseUser: FirebaseUser | null) => {
@@ -51,17 +46,20 @@ export class AuthService {
       }
       
       console.log('✅ Usuario autenticado, obteniendo datos de Firestore...');
-      const userDocRef = doc(this.firestore, `users/${firebaseUser.uid}`);
       
-      return docData(userDocRef).pipe(
-        tap(data => console.log('📄 Datos obtenidos de Firestore:', data)),
-        // Map the document data to User type, or null if not found
-        switchMap((data: any) => {
-          if (!data) {
+      // ✅ Usar from + getDoc en lugar de docData
+      return from(
+        getDoc(doc(this.firestore, `users/${firebaseUser.uid}`))
+      ).pipe(
+        tap(docSnap => console.log('📄 Documento obtenido:', docSnap.exists())),
+        switchMap(docSnap => {
+          if (!docSnap.exists()) {
+            console.log('⚠️ Documento de usuario no existe');
             return of(null);
           }
-          // If you need to ensure the object matches User, you can do additional mapping here
-          return of(data as User);
+          const userData = docSnap.data() as User;
+          console.log('✅ Datos del usuario:', userData);
+          return of(userData);
         }),
         catchError(error => {
           console.error('❌ Error al obtener datos de Firestore:', error);
@@ -75,7 +73,9 @@ export class AuthService {
   registerStudent(data: CreateUserData): Observable<User> {
     console.log('📝 Iniciando registro de estudiante:', data.correo);
     
-    // Validación del rol
+    const auth = this.auth;
+    const firestore = this.firestore;
+    
     if (!data.rol || data.rol !== 'estudiante') {
       data.rol = 'estudiante';
     }
@@ -83,17 +83,15 @@ export class AuthService {
     return from(
       (async () => {
         try {
-          // 1. Crear usuario en Authentication
           console.log('🔐 Paso 1: Creando usuario en Auth...');
           const credential = await createUserWithEmailAndPassword(
-            this.auth, 
+            auth, 
             data.correo, 
             data.password
           );
           
           console.log('✅ Usuario creado en Auth:', credential.user.uid);
 
-          // 2. Preparar datos del usuario
           const newUser: User = {
             uid: credential.user.uid,
             nombre: data.nombre,
@@ -107,33 +105,21 @@ export class AuthService {
             updatedAt: new Date()
           };
 
-          console.log('📦 Datos del usuario a guardar:', newUser);
-
-          // 3. Guardar en Firestore
           console.log('💾 Paso 2: Guardando en Firestore...');
-          const userDocRef = doc(this.firestore, `users/${credential.user.uid}`);
-          
+          const userDocRef = doc(firestore, `users/${credential.user.uid}`);
           await setDoc(userDocRef, newUser);
           
           console.log('✅ Usuario guardado en Firestore exitosamente');
 
-          // 4. Verificar que se guardó correctamente
-          console.log('🔍 Paso 3: Verificando datos guardados...');
           const savedDoc = await getDoc(userDocRef);
-          
           if (savedDoc.exists()) {
-            console.log('✅ Verificación exitosa. Usuario registrado correctamente');
-            console.log('📄 Datos verificados:', savedDoc.data());
-          } else {
-            console.warn('⚠️ El documento no se encontró después de guardarlo');
+            console.log('✅ Verificación exitosa');
           }
 
           return newUser;
           
         } catch (error: any) {
           console.error('❌ Error durante el registro:', error);
-          console.error('📋 Código de error:', error.code);
-          console.error('📋 Mensaje:', error.message);
           throw error;
         }
       })()
@@ -141,14 +127,17 @@ export class AuthService {
   }
 
   // Login con email y password
- login(email: string, password: string): Observable<User> {
+  login(email: string, password: string): Observable<User> {
     console.log('🔐 Login:', email);
+    
+    const auth = this.auth;
+    const firestore = this.firestore;
     
     return from(
       (async () => {
         try {
           // Buscar usuario en Firestore primero
-          const usersRef = collection(this.firestore, 'users');
+          const usersRef = collection(firestore, 'users');
           const q = query(usersRef, where('correo', '==', email));
           const querySnapshot = await getDocs(q);
           
@@ -162,16 +151,14 @@ export class AuthService {
           if (userData.needsFirstLogin && userData.tempPassword === password) {
             console.log('🆕 Primer login - Creando cuenta en Authentication...');
             
-            // Crear en Authentication
             const credential = await createUserWithEmailAndPassword(
-              this.auth,
+              auth,
               email,
               password
             );
             
-            // Actualizar Firestore con nuevo UID
-            const oldDocRef = doc(this.firestore, `users/${userData.uid}`);
-            const newDocRef = doc(this.firestore, `users/${credential.user.uid}`);
+            const oldDocRef = doc(firestore, `users/${userData.uid}`);
+            const newDocRef = doc(firestore, `users/${credential.user.uid}`);
             
             const updatedUser = {
               ...userData,
@@ -189,8 +176,8 @@ export class AuthService {
           }
           
           // Login normal
-          const credential = await signInWithEmailAndPassword(this.auth, email, password);
-          const userDoc = await getDoc(doc(this.firestore, `users/${credential.user.uid}`));
+          const credential = await signInWithEmailAndPassword(auth, email, password);
+          const userDoc = await getDoc(doc(firestore, `users/${credential.user.uid}`));
           
           if (!userDoc.exists()) {
             throw new Error('Usuario no encontrado');
@@ -205,21 +192,24 @@ export class AuthService {
       })()
     );
   }
+
   // Login con Google
   loginWithGoogle(): Observable<User> {
     console.log('🔐 Iniciando login con Google...');
+    
+    const auth = this.auth;
+    const firestore = this.firestore;
     const provider = new GoogleAuthProvider();
     
     return from(
       (async () => {
         try {
-          const credential = await signInWithPopup(this.auth, provider);
+          const credential = await signInWithPopup(auth, provider);
           console.log('✅ Autenticación con Google exitosa:', credential.user.uid);
           
-          const userDocRef = doc(this.firestore, `users/${credential.user.uid}`);
+          const userDocRef = doc(firestore, `users/${credential.user.uid}`);
           const userDoc = await getDoc(userDocRef);
           
-          // Si el usuario no existe, crear uno nuevo como estudiante
           if (!userDoc.exists()) {
             console.log('📝 Usuario no existe, creando nuevo perfil...');
             const newUser: User = {
@@ -252,11 +242,14 @@ export class AuthService {
   createUser(data: CreateUserData): Observable<User> {
     console.log('📝 Admin creando usuario:', data.correo);
     
+    const auth = this.auth;
+    const firestore = this.firestore;
+    
     return from(
       (async () => {
         try {
           const credential = await createUserWithEmailAndPassword(
-            this.auth, 
+            auth, 
             data.correo, 
             data.password
           );
@@ -274,7 +267,7 @@ export class AuthService {
             updatedAt: new Date()
           };
 
-          await setDoc(doc(this.firestore, `users/${credential.user.uid}`), newUser);
+          await setDoc(doc(firestore, `users/${credential.user.uid}`), newUser);
           console.log('✅ Usuario creado por admin');
           
           return newUser;
@@ -324,18 +317,24 @@ export class AuthService {
   async redirectToDashboard(user: User): Promise<void> {
     console.log('🔀 Redirigiendo usuario con rol:', user.rol);
     
-    switch (user.rol) {
-      case 'estudiante':
-        await this.router.navigate(['/dashboard-alumno']);
-        break;
-      case 'coordinador':
-        await this.router.navigate(['/dashboard-coordinador']);
-        break;
-      case 'admin':
-        await this.router.navigate(['/dashboard-admin']);
-        break;
-      default:
-        await this.router.navigate(['/inicio']);
+    try {
+      switch (user.rol) {
+        case 'estudiante':
+          await this.router.navigate(['/dashboard-alumno']);
+          break;
+        case 'coordinador':
+          console.log('🔀 Navegando a dashboard-coordinador...');
+          const result = await this.router.navigate(['/dashboard-coordinador']);
+          console.log('🔀 Resultado navegación:', result);
+          break;
+        case 'admin':
+          await this.router.navigate(['/dashboard-admin']);
+          break;
+        default:
+          await this.router.navigate(['/inicio']);
+      }
+    } catch (error) {
+      console.error('❌ Error en redirectToDashboard:', error);
     }
   }
 

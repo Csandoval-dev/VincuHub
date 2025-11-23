@@ -1,7 +1,7 @@
 export type UserRole = 'estudiante' | 'coordinador' | 'admin';
 
 export interface User {
-    fotoUrl: string | undefined;
+    fotoUrl?: string ;
   uid: string;
   nombre: string;
   apellido?: string;

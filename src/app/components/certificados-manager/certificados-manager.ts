@@ -29,7 +29,7 @@ interface EstudianteCertificado extends Inscripcion {
           (change)="onEventoChange()"
           class="evento-select">
           <option value="">-- Seleccionar evento --</option>
-          <option *ngFor="let evento of eventosFin finalizados" [value]="evento.eventoId">
+         <option *ngFor="let evento of eventos" [value]="evento.eventoId">
             {{ evento.titulo }} - {{ evento.fecha | date: 'dd/MM/yyyy' }}
           </option>
         </select>

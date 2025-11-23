@@ -26,8 +26,8 @@ import { CertificadosManagerComponent } from '../../components/certificados-mana
     ForoEventoComponent,
     CertificadosManagerComponent
   ],
-  templateUrl: './dashboard-coordinador.component.html',
-  styleUrls: ['./dashboard-coordinador.component.scss']
+  templateUrl: './dashboard-coordinador.html',
+  styleUrls: ['./dashboard-coordinador.scss']
 })
 export class DashboardCoordinadorComponent implements OnInit {
   private authService = inject(AuthService);
