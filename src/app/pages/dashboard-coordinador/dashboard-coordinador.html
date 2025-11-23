@@ -1,63 +1,205 @@
-<!-- src/app/pages/dashboard-coordinador/dashboard-coordinador.component.html -->
 
-<div class="dashboard-container">
-  <!-- Header -->
-  <header class="dashboard-header">
-    <div class="header-content">
-      <h1>Dashboard Coordinador</h1>
-      <div class="user-info">
-        <span>{{ currentUser?.nombre }}</span>
-        <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
-      </div>
-    </div>
-  </header>
+
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <app-sidebar-coordinador
+    [currentUser]="currentUser"
+    [seccionActiva]="seccionActiva"
+    (seccionChange)="cambiarSeccion($event)"
+    (logout)="logout()">
+  </app-sidebar-coordinador>
 
   <!-- Main Content -->
-  <main class="dashboard-main">
-    <div class="welcome-section">
-      <h2>Panel de Coordinación - {{ currentUser?.nombre }}</h2>
-      <p><strong>Rol:</strong> Coordinador de Carrera</p>
-      <p><strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}</p>
+  <main class="main-content">
+    
+    <!-- Vista Dashboard (Inicio) -->
+    <div *ngIf="seccionActiva === 'dashboard'" class="content-section">
+      <!-- Header -->
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Resumen de tus actividades y eventos</p>
+        </div>
+      </header>
+
+      <!-- Welcome Card -->
+      <div class="welcome-card">
+        <div class="welcome-content">
+          <h2>¡Bienvenido, {{ currentUser?.nombre }}! 👋</h2>
+          <p>Aquí puedes gestionar todos tus eventos y actividades de vinculación</p>
+          <div class="welcome-info">
+            <span class="info-item">
+              <strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}
+            </span>
+            <span class="info-item">
+              <strong>Rol:</strong> Coordinador de Carrera
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">📅</div>
+          <div class="stat-content">
+            <div class="stat-label">Eventos Creados</div>
+            <div class="stat-value">{{ estadisticas.totalEventos }}</div>
+            <div class="stat-change">Total de eventos</div>
+          </div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <div class="stat-label">Eventos Activos</div>
+            <div class="stat-value">{{ estadisticas.eventosActivos }}</div>
+            <div class="stat-change">En curso ahora</div>
+          </div>
+        </div>
+
+        <div class="stat-card purple">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <div class="stat-label">Estudiantes Inscritos</div>
+            <div class="stat-value">{{ estadisticas.totalInscritos }}</div>
+            <div class="stat-change">En tus eventos</div>
+          </div>
+        </div>
+
+        <div class="stat-card orange">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-content">
+            <div class="stat-label">Horas Certificadas</div>
+            <div class="stat-value">{{ estadisticas.horasCertificadas }}</div>
+            <div class="stat-change">Total registradas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-section">
+        <h3 class="section-title">Acciones Rápidas</h3>
+        <div class="actions-grid">
+          <button class="action-card primary" (click)="cambiarSeccion('evento-create')">
+            <div class="action-icon">➕</div>
+            <div class="action-content">
+              <div class="action-title">Crear Evento</div>
+              <div class="action-desc">Publicar nueva actividad</div>
+            </div>
+          </button>
+
+          <button class="action-card" (click)="cambiarSeccion('eventos-list')">
+            <div class="action-icon">📋</div>
+            <div class="action-content">
+              <div class="action-title">Ver Mis Eventos</div>
+              <div class="action-desc">Gestionar eventos existentes</div>
+            </div>
+          </button>
+
+          <button class="action-card" (click)="cambiarSeccion('asistencia')">
+            <div class="action-icon">✅</div>
+            <div class="action-content">
+              <div class="action-title">Registrar Asistencia</div>
+              <div class="action-desc">Validar participantes</div>
+            </div>
+          </button>
+
+          <button class="action-card" (click)="cambiarSeccion('certificados')">
+            <div class="action-icon">📜</div>
+            <div class="action-content">
+              <div class="action-title">Generar Certificados</div>
+              <div class="action-desc">Descargar documentos</div>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Eventos Creados</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">eventos totales</span>
-      </div>
-
-      <div class="stat-card">
-        <h3>Estudiantes Inscritos</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">en mis eventos</span>
-      </div>
-
-      <div class="stat-card">
-        <h3>Eventos Activos</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">próximamente</span>
-      </div>
-
-      <div class="stat-card">
-        <h3>Horas Certificadas</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">este mes</span>
+    <!-- Vista Mis Eventos -->
+    <div *ngIf="seccionActiva === 'eventos-list'" class="content-section">
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Mis Eventos</h1>
+          <p class="page-subtitle">Gestiona todos tus eventos creados</p>
+        </div>
+        <button class="btn-primary" (click)="cambiarSeccion('evento-create')">
+          ➕ Nuevo Evento
+        </button>
+      </header>
+      
+      <!-- Aquí irá el componente de lista de eventos -->
+      <div class="placeholder-content">
+        <div class="placeholder-icon">📅</div>
+        <p>Componente de lista de eventos próximamente...</p>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h3>Gestión de Eventos</h3>
-      <div class="actions-grid">
-        <button class="action-btn primary">➕ Crear Nuevo Evento</button>
-        <button class="action-btn">📋 Mis Eventos</button>
-        <button class="action-btn">✅ Validar Asistencias</button>
-        <button class="action-btn">📊 Reportes</button>
-        <button class="action-btn">👥 Ver Estudiantes Inscritos</button>
-        <button class="action-btn">💬 Moderar Foros</button>
+    <!-- Vista Crear Evento -->
+    <div *ngIf="seccionActiva === 'evento-create'" class="content-section">
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Crear Nuevo Evento</h1>
+          <p class="page-subtitle">Completa la información del evento</p>
+        </div>
+      </header>
+      
+      <!-- Aquí irá el formulario de crear evento -->
+      <div class="placeholder-content">
+        <div class="placeholder-icon">➕</div>
+        <p>Formulario de evento próximamente...</p>
       </div>
     </div>
+
+    <!-- Vista Gestión de Asistencia -->
+    <div *ngIf="seccionActiva === 'asistencia'" class="content-section">
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Gestión de Asistencia</h1>
+          <p class="page-subtitle">Registra la asistencia de estudiantes</p>
+        </div>
+      </header>
+      
+      <!-- Aquí irá el componente de asistencia -->
+      <div class="placeholder-content">
+        <div class="placeholder-icon">✅</div>
+        <p>Gestión de asistencia próximamente...</p>
+      </div>
+    </div>
+
+    <!-- Vista Certificados -->
+    <div *ngIf="seccionActiva === 'certificados'" class="content-section">
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Certificados</h1>
+          <p class="page-subtitle">Genera y descarga certificados de participación</p>
+        </div>
+      </header>
+      
+      <!-- Aquí irá el generador de certificados -->
+      <div class="placeholder-content">
+        <div class="placeholder-icon">📜</div>
+        <p>Generador de certificados próximamente...</p>
+      </div>
+    </div>
+
+    <!-- Vista Configuración -->
+    <div *ngIf="seccionActiva === 'configuracion'" class="content-section">
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Configuración</h1>
+          <p class="page-subtitle">Ajustes de tu cuenta</p>
+        </div>
+      </header>
+      
+      <div class="config-content">
+        <div class="config-card">
+          <h3>💬 Gestión de Foros</h3>
+          <p>Modera y administra los foros de discusión de tus eventos</p>
+          <app-foro-evento [coordinadorUid]="currentUser?.uid || ''"></app-foro-evento>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
