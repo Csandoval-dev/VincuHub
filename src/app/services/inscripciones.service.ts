@@ -11,11 +11,10 @@ import {
   getDocs,
   query,
   where,
-  collectionData,
   Timestamp,
   runTransaction
 } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
+import { Observable, from, map } from 'rxjs';
 import { Inscripcion, UpdateAsistenciaData } from '../models/inscripcion.model';
 import { AuthService } from './auth.service';
 import { EventosService } from './eventos.service';
@@ -68,27 +67,49 @@ export class InscripcionesService {
     await this.eventosService.incrementarInscritos(eventoId);
   }
 
-  // Obtener inscripciones de un evento
+  // ✅ CORREGIDO: Obtener inscripciones de un evento
   getInscripcionesByEvento(eventoId: string): Observable<Inscripcion[]> {
-    const q = query(
-      this.inscripcionesCollection,
-      where('eventoId', '==', eventoId)
-    );
-
-    return collectionData(q, { idField: 'inscripcionId' }).pipe(
-      map((inscripciones: any[]) => inscripciones.map(i => this.convertTimestamps(i)))
+    const firestore = this.firestore; // Guardar referencia
+    
+    return from(
+      (async () => {
+        const q = query(
+          collection(firestore, 'inscripciones'),
+          where('eventoId', '==', eventoId)
+        );
+        
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => {
+          const data = doc.data();
+          return this.convertTimestamps({
+            ...data,
+            inscripcionId: doc.id
+          });
+        });
+      })()
     );
   }
 
-  // Obtener inscripciones de un estudiante
+  // ✅ CORREGIDO: Obtener inscripciones de un estudiante
   getInscripcionesByEstudiante(uid: string): Observable<Inscripcion[]> {
-    const q = query(
-      this.inscripcionesCollection,
-      where('uid', '==', uid)
-    );
-
-    return collectionData(q, { idField: 'inscripcionId' }).pipe(
-      map((inscripciones: any[]) => inscripciones.map(i => this.convertTimestamps(i)))
+    const firestore = this.firestore; // Guardar referencia
+    
+    return from(
+      (async () => {
+        const q = query(
+          collection(firestore, 'inscripciones'),
+          where('uid', '==', uid)
+        );
+        
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => {
+          const data = doc.data();
+          return this.convertTimestamps({
+            ...data,
+            inscripcionId: doc.id
+          });
+        });
+      })()
     );
   }
 
@@ -164,19 +185,25 @@ export class InscripcionesService {
     if (eventosIds.length === 0) return 0;
 
     // Obtener inscripciones con asistencia de esos eventos
-    const inscripcionesQuery = query(
-      this.inscripcionesCollection,
-      where('eventoId', 'in', eventosIds.slice(0, 10)), // Firestore limita a 10
-      where('asistencia', '==', true)
-    );
-    
-    const inscripcionesSnapshot = await getDocs(inscripcionesQuery);
-    
+    // Firestore limita 'in' a 10 elementos, así que dividir en batches
     let totalHoras = 0;
-    inscripcionesSnapshot.forEach(doc => {
-      const inscripcion = doc.data() as Inscripcion;
-      totalHoras += inscripcion.horasGanadas || 0;
-    });
+    
+    for (let i = 0; i < eventosIds.length; i += 10) {
+      const batch = eventosIds.slice(i, i + 10);
+      
+      const inscripcionesQuery = query(
+        this.inscripcionesCollection,
+        where('eventoId', 'in', batch),
+        where('asistencia', '==', true)
+      );
+      
+      const inscripcionesSnapshot = await getDocs(inscripcionesQuery);
+      
+      inscripcionesSnapshot.forEach(doc => {
+        const inscripcion = doc.data() as Inscripcion;
+        totalHoras += inscripcion.horasGanadas || 0;
+      });
+    }
 
     return totalHoras;
   }
@@ -184,8 +211,14 @@ export class InscripcionesService {
   private convertTimestamps(inscripcion: any): Inscripcion {
     return {
       ...inscripcion,
-      fechaInscripcion: inscripcion.fechaInscripcion?.toDate ? inscripcion.fechaInscripcion.toDate() : inscripcion.fechaInscripcion,
-      fechaRegistroAsistencia: inscripcion.fechaRegistroAsistencia?.toDate ? inscripcion.fechaRegistroAsistencia.toDate() : inscripcion.fechaRegistroAsistencia
+      fechaInscripcion: inscripcion.fechaInscripcion?.toDate 
+        ? inscripcion.fechaInscripcion.toDate() 
+        : new Date(inscripcion.fechaInscripcion),
+      fechaRegistroAsistencia: inscripcion.fechaRegistroAsistencia?.toDate 
+        ? inscripcion.fechaRegistroAsistencia.toDate() 
+        : inscripcion.fechaRegistroAsistencia 
+          ? new Date(inscripcion.fechaRegistroAsistencia)
+          : undefined
     };
   }
 }

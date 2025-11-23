@@ -7,15 +7,14 @@ import {
   doc, 
   addDoc,
   updateDoc,
-  deleteDoc,
+  getDoc,
   getDocs,
   query,
   where,
   orderBy,
-  collectionData,
   Timestamp
 } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
+import { Observable, from, map } from 'rxjs';
 import { Foro, MensajeForo, CreateMensajeData } from '../models/foro.model';
 import { AuthService } from './auth.service';
 
@@ -25,8 +24,6 @@ import { AuthService } from './auth.service';
 export class ForosService {
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
-
-  private forosCollection = collection(this.firestore, 'foros');
 
   // Crear foro automáticamente al crear evento
   async crearForoParaEvento(eventoId: string, tituloEvento: string): Promise<string> {
@@ -44,7 +41,7 @@ export class ForosService {
       mensajesCount: 0
     };
 
-    const docRef = await addDoc(this.forosCollection, {
+    const docRef = await addDoc(collection(this.firestore, 'foros'), {
       ...foro,
       fechaCreacion: Timestamp.now()
     });
@@ -60,7 +57,7 @@ export class ForosService {
   // Obtener foro por evento
   async getForoByEvento(eventoId: string): Promise<Foro | null> {
     const q = query(
-      this.forosCollection,
+      collection(this.firestore, 'foros'),
       where('eventoId', '==', eventoId)
     );
     
@@ -68,8 +65,11 @@ export class ForosService {
     
     if (snapshot.empty) return null;
     
-    const doc = snapshot.docs[0];
-    return this.convertTimestamps({ ...doc.data(), foroId: doc.id }) as Foro;
+    const docSnap = snapshot.docs[0];
+    return this.convertTimestamps({ 
+      ...docSnap.data(), 
+      foroId: docSnap.id 
+    }) as Foro;
   }
 
   // Agregar mensaje al foro
@@ -98,25 +98,36 @@ export class ForosService {
 
     // Incrementar contador de mensajes
     const foroRef = doc(this.firestore, `foros/${foroId}`);
-    const foroDoc = await getDocs(query(collection(this.firestore, 'foros'), where('foroId', '==', foroId)));
-    const foroData = foroDoc.docs[0]?.data() as Foro;
+    const foroDoc = await getDoc(foroRef);
     
-    await updateDoc(foroRef, {
-      mensajesCount: (foroData.mensajesCount || 0) + 1
-    });
+    if (foroDoc.exists()) {
+      const foroData = foroDoc.data() as Foro;
+      await updateDoc(foroRef, {
+        mensajesCount: (foroData.mensajesCount || 0) + 1
+      });
+    }
   }
 
-  // Obtener mensajes del foro
+  // ✅ CORREGIDO: Obtener mensajes del foro
   getMensajesByForo(foroId: string): Observable<MensajeForo[]> {
-    const mensajesCollection = collection(this.firestore, `foros/${foroId}/mensajes`);
-    const q = query(mensajesCollection, orderBy('fecha', 'asc'));
-
-    return collectionData(q, { idField: 'mensajeId' }).pipe(
-      map((mensajes: any[]) => 
-        mensajes
-          .filter(m => !m.eliminado)
-          .map(m => this.convertTimestamps(m))
-      )
+    const firestore = this.firestore; // Guardar referencia
+    
+    return from(
+      (async () => {
+        const mensajesCollection = collection(firestore, `foros/${foroId}/mensajes`);
+        const q = query(mensajesCollection, orderBy('fecha', 'asc'));
+        
+        const snapshot = await getDocs(q);
+        return snapshot.docs
+          .map(doc => {
+            const data = doc.data();
+            return this.convertTimestamps({
+              ...data,
+              mensajeId: doc.id
+            });
+          })
+          .filter(m => !m.eliminado);
+      })()
     );
   }
 
@@ -156,8 +167,16 @@ export class ForosService {
   private convertTimestamps(data: any): any {
     return {
       ...data,
-      fechaCreacion: data.fechaCreacion?.toDate ? data.fechaCreacion.toDate() : data.fechaCreacion,
-      fecha: data.fecha?.toDate ? data.fecha.toDate() : data.fecha
+      fechaCreacion: data.fechaCreacion?.toDate 
+        ? data.fechaCreacion.toDate() 
+        : data.fechaCreacion 
+          ? new Date(data.fechaCreacion)
+          : undefined,
+      fecha: data.fecha?.toDate 
+        ? data.fecha.toDate() 
+        : data.fecha
+          ? new Date(data.fecha)
+          : undefined
     };
   }
 }

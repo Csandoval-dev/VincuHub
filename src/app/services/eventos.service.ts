@@ -87,20 +87,24 @@ export class EventosService {
     
     return from(
       (async () => {
+        // Temporalmente SIN orderBy hasta crear el índice
         const q = query(
           collection(firestore, 'eventos'),
-          where('creadorUid', '==', coordinadorUid),
-          orderBy('fecha', 'desc')
+          where('creadorUid', '==', coordinadorUid)
+          // orderBy('fecha', 'desc') // ⚠️ Deshabilitado temporalmente
         );
         
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => {
+        const eventos = snapshot.docs.map(doc => {
           const data = doc.data();
           return this.convertTimestamps({
             ...data,
             eventoId: doc.id
           });
         });
+        
+        // Ordenar en memoria
+        return eventos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
       })()
     );
   }
