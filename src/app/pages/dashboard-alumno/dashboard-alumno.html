@@ -1,54 +1,522 @@
+<!-- src/app/pages/dashboard-alumno/dashboard-alumno.component.html -->
 
-<div class="dashboard-container">
-  <!-- Header -->
+<div class="dashboard-container" *ngIf="!loading">
+  
+  <!-- ========== HEADER ========== -->
   <header class="dashboard-header">
     <div class="header-content">
-      <h1>Dashboard Estudiante</h1>
-      <div class="user-info">
-        <span>{{ currentUser?.nombre }}</span>
-        <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+      <div class="header-left">
+        <h1>🎓 Dashboard Estudiante</h1>
+        <p class="header-subtitle">Gestiona tus eventos y horas de vinculación</p>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <div class="user-avatar">
+            {{ getInitials(currentUser?.nombre || '') }}
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ currentUser?.nombre }} {{ currentUser?.apellido }}</span>
+            <span class="user-role">{{ currentUser?.carrera }}</span>
+          </div>
+        </div>
+        <button (click)="logout()" class="btn-logout">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-width="2"/>
+            <polyline points="16 17 21 12 16 7" stroke-width="2"/>
+            <line x1="21" y1="12" x2="9" y2="12" stroke-width="2"/>
+          </svg>
+          Salir
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- ========== MAIN CONTENT ========== -->
   <main class="dashboard-main">
+    
+    <!-- Welcome Section -->
     <div class="welcome-section">
-      <h2>¡Bienvenido, {{ currentUser?.nombre }}!</h2>
-      <p><strong>Carrera:</strong> {{ currentUser?.carrera || 'No especificada' }}</p>
-      <p><strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}</p>
+      <div class="welcome-content">
+        <h2>¡Bienvenido, {{ currentUser?.nombre }}! 👋</h2>
+        <p class="campus-info">
+          <strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}
+        </p>
+      </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- ========== STATS CARDS ========== -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Horas de Vinculación</h3>
-        <p class="stat-number">{{ currentUser?.horasVinculacionTotal || 0 }}</p>
-        <span class="stat-label">horas completadas</span>
+      <div class="stat-card stat-primary">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-content">
+          <h3>Horas de Vinculación</h3>
+          <p class="stat-number">{{ stats.horasTotales }}</p>
+          <span class="stat-label">horas completadas</span>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(stats.horasTotales / 60) * 100"></div>
+          </div>
+          <span class="progress-text">{{ stats.horasTotales }} / 60 horas requeridas</span>
+        </div>
       </div>
 
-      <div class="stat-card">
-        <h3>Eventos Inscritos</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">eventos activos</span>
+      <div class="stat-card stat-success">
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <h3>Eventos Inscritos</h3>
+          <p class="stat-number">{{ stats.eventosInscritos }}</p>
+          <span class="stat-label">eventos activos</span>
+        </div>
       </div>
 
-      <div class="stat-card">
-        <h3>Eventos Completados</h3>
-        <p class="stat-number">0</p>
-        <span class="stat-label">este semestre</span>
+      <div class="stat-card stat-info">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>Eventos Completados</h3>
+          <p class="stat-number">{{ stats.eventosCompletados }}</p>
+          <span class="stat-label">este semestre</span>
+        </div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h3>Acciones Rápidas</h3>
-      <div class="actions-grid">
-        <button class="action-btn">📅 Ver Eventos Disponibles</button>
-        <button class="action-btn">📝 Mis Inscripciones</button>
-        <button class="action-btn">💬 Foros de Discusión</button>
-        <button class="action-btn">📊 Mi Historial</button>
+    <!-- ========== NAVIGATION TABS ========== -->
+    <div class="nav-tabs">
+      <button 
+        class="tab-button"
+        [class.active]="vistaActiva === 'eventos'"
+        (click)="cambiarVista('eventos')">
+        📅 Eventos Disponibles
+      </button>
+      <button 
+        class="tab-button"
+        [class.active]="vistaActiva === 'inscripciones'"
+        (click)="cambiarVista('inscripciones')">
+        📝 Mis Inscripciones
+      </button>
+      <button 
+        class="tab-button"
+        [class.active]="vistaActiva === 'historial'"
+        (click)="cambiarVista('historial')">
+        📊 Mi Historial
+      </button>
+    </div>
+
+    <!-- ========== VISTA: EVENTOS DISPONIBLES ========== -->
+    <div *ngIf="vistaActiva === 'eventos'" class="content-section">
+      
+      <!-- Filtros -->
+      <div class="filters-section">
+        <div class="search-box">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="filtrarEventos()"
+            placeholder="Buscar eventos..."
+            class="search-input">
+        </div>
+
+        <div class="filter-group">
+          <select [(ngModel)]="filtroTipo" (change)="filtrarEventos()" class="filter-select">
+            <option value="">Todos los tipos</option>
+            <option value="feria">Feria</option>
+            <option value="voluntariado">Voluntariado</option>
+            <option value="conferencia">Conferencia</option>
+            <option value="taller">Taller</option>
+          </select>
+
+          <select [(ngModel)]="filtroCampus" (change)="filtrarEventos()" class="filter-select">
+            <option value="">Todos los campus</option>
+            <option value="San Pedro Sula">San Pedro Sula</option>
+            <option value="Tegucigalpa">Tegucigalpa</option>
+            <option value="La Ceiba">La Ceiba</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading Eventos -->
+      <div *ngIf="loadingEventos" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando eventos...</p>
+      </div>
+
+      <!-- Sin eventos -->
+      <div *ngIf="!loadingEventos && eventosFiltrados.length === 0" class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>No hay eventos disponibles</h3>
+        <p>Vuelve pronto para ver nuevos eventos</p>
+      </div>
+
+      <!-- Grid de eventos -->
+      <div *ngIf="!loadingEventos && eventosFiltrados.length > 0" class="eventos-grid">
+        <div *ngFor="let evento of eventosFiltrados" class="evento-card">
+          <div class="evento-imagen">
+            <img *ngIf="evento.imagenUrl" [src]="evento.imagenUrl" [alt]="evento.titulo">
+            <div *ngIf="!evento.imagenUrl" class="imagen-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                <polyline points="21 15 16 10 5 21" stroke-width="2"/>
+              </svg>
+            </div>
+            <span class="evento-tipo-badge">{{ getTipoLabel(evento.tipo) }}</span>
+          </div>
+
+          <div class="evento-content">
+            <h3 class="evento-titulo">{{ evento.titulo }}</h3>
+            
+            <!-- ✅ NUEVO: Badge de estado inscrito -->
+            <div *ngIf="estaInscritoEnEvento(evento.eventoId!)" class="badge-inscrito">
+              ✅ Inscrito
+            </div>
+            
+            <p class="evento-descripcion">{{ evento.descripcion }}</p>
+
+            <div class="evento-detalles">
+              <div class="detalle-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+                  <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+                  <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+                </svg>
+                <span>{{ formatDate(evento.fecha) }}</span>
+              </div>
+
+              <div class="detalle-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                  <polyline points="12 6 12 12 16 14" stroke-width="2"/>
+                </svg>
+                <span>{{ evento.horaInicio }} - {{ evento.horaFin }}</span>
+              </div>
+
+              <div class="detalle-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+                  <circle cx="12" cy="10" r="3" stroke-width="2"/>
+                </svg>
+                <span>{{ evento.ubicacion }}</span>
+              </div>
+
+              <div class="detalle-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/>
+                  <circle cx="9" cy="7" r="4" stroke-width="2"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2"/>
+                </svg>
+                <span>{{ evento.inscritosCount || 0 }} / {{ evento.cupo }} inscritos</span>
+              </div>
+            </div>
+
+            <!-- ✅ ACTUALIZADO: Botones con estado -->
+            <div class="evento-actions">
+              <button 
+                class="btn-ver-detalles"
+                (click)="verDetallesEvento(evento)">
+                👁️ Ver Detalles
+              </button>
+              
+              <button 
+                *ngIf="!estaInscritoEnEvento(evento.eventoId!)"
+                class="btn-inscribirse"
+                (click)="abrirModalInscripcion(evento)"
+                [disabled]="debeDeshabilitarBoton(evento)">
+                {{ getTextoBotonInscripcion(evento) }}
+              </button>
+
+              <button 
+                *ngIf="estaInscritoEnEvento(evento.eventoId!)"
+                class="btn-cancelar"
+                (click)="cancelarInscripcion(evento.eventoId!)"
+                [disabled]="cancelandoInscripcion">
+                {{ cancelandoInscripcion ? 'Cancelando...' : '🗑️ Cancelar Inscripción' }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- ========== VISTA: MIS INSCRIPCIONES ========== -->
+    <div *ngIf="vistaActiva === 'inscripciones'" class="content-section">
+      
+      <div *ngIf="loadingInscripciones" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando inscripciones...</p>
+      </div>
+
+      <!-- Eventos Inscritos -->
+      <div *ngIf="!loadingInscripciones">
+        <h3 class="section-title">📅 Eventos Inscritos ({{ eventosInscritos.length }})</h3>
+
+        <div *ngIf="eventosInscritos.length === 0" class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>No tienes eventos inscritos</h3>
+          <p>Explora los eventos disponibles y regístrate</p>
+        </div>
+
+        <div class="eventos-list">
+          <div *ngFor="let evento of eventosInscritos" class="evento-list-item">
+            <div class="evento-list-imagen">
+              <img *ngIf="evento.imagenUrl" [src]="evento.imagenUrl" [alt]="evento.titulo">
+              <div *ngIf="!evento.imagenUrl" class="imagen-placeholder-small">
+                📅
+              </div>
+            </div>
+
+            <div class="evento-list-info">
+              <h4>{{ evento.titulo }}</h4>
+              <p class="evento-fecha">{{ formatDate(evento.fecha) }} - {{ evento.horaInicio }}</p>
+              <p class="evento-ubicacion">📍 {{ evento.ubicacion }}</p>
+              <span class="estado-badge estado-inscrito">✅ Inscrito</span>
+            </div>
+
+            <div class="evento-list-actions">
+              <button class="btn-foro" (click)="abrirForo(evento)">
+                💬 Ver Foro
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== VISTA: HISTORIAL ========== -->
+    <div *ngIf="vistaActiva === 'historial'" class="content-section">
+      
+      <h3 class="section-title">📊 Eventos Completados ({{ eventosCompletados.length }})</h3>
+
+      <div *ngIf="eventosCompletados.length === 0" class="empty-state">
+        <div class="empty-icon">📊</div>
+        <h3>Sin historial aún</h3>
+        <p>Aquí aparecerán los eventos que hayas completado</p>
+      </div>
+
+      <div class="eventos-list">
+        <div *ngFor="let evento of eventosCompletados" class="evento-list-item">
+          <div class="evento-list-imagen">
+            <img *ngIf="evento.imagenUrl" [src]="evento.imagenUrl" [alt]="evento.titulo">
+            <div *ngIf="!evento.imagenUrl" class="imagen-placeholder-small">
+              ✅
+            </div>
+          </div>
+
+          <div class="evento-list-info">
+            <h4>{{ evento.titulo }}</h4>
+            <p class="evento-fecha">{{ formatDate(evento.fecha) }}</p>
+            <p class="evento-ubicacion">📍 {{ evento.ubicacion }}</p>
+            
+            <div class="horas-info">
+              <span class="horas-badge">
+                {{ getInscripcionByEvento(evento.eventoId!)?.horasGanadas || 0 }} horas certificadas
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
+</div>
+
+<!-- ========== LOADING GENERAL ========== -->
+<div *ngIf="loading" class="loading-overlay">
+  <div class="spinner-large"></div>
+  <p>Cargando dashboard...</p>
+</div>
+
+<!-- ========== MODAL: DETALLES DEL EVENTO ========== -->
+<div *ngIf="modalDetalleAbierto" class="modal-overlay" (click)="cerrarModalDetalle()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>📋 Detalles del Evento</h2>
+      <button class="btn-close" (click)="cerrarModalDetalle()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="eventoDetalleAbierto">
+      <div *ngIf="eventoDetalleAbierto.imagenUrl" class="modal-imagen-grande">
+        <img [src]="eventoDetalleAbierto.imagenUrl" [alt]="eventoDetalleAbierto.titulo">
+      </div>
+
+      <div class="evento-detalle-modal">
+        <h3>{{ eventoDetalleAbierto.titulo }}</h3>
+        
+        <!-- Badge de estado -->
+        <div class="badges-container">
+          <span class="badge badge-tipo">{{ getTipoLabel(eventoDetalleAbierto.tipo) }}</span>
+          <span *ngIf="estaInscritoEnEvento(eventoDetalleAbierto.eventoId!)" class="badge badge-inscrito">
+            ✅ Ya estás inscrito
+          </span>
+        </div>
+
+        <p class="modal-descripcion">{{ eventoDetalleAbierto.descripcion }}</p>
+
+        <div class="modal-detalles">
+          <div class="modal-detalle-item">
+            <strong>📅 Fecha:</strong>
+            <span>{{ formatDate(eventoDetalleAbierto.fecha) }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>⏰ Horario:</strong>
+            <span>{{ eventoDetalleAbierto.horaInicio }} - {{ eventoDetalleAbierto.horaFin }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>📍 Ubicación:</strong>
+            <span>{{ eventoDetalleAbierto.ubicacion }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>🏢 Campus:</strong>
+            <span>{{ eventoDetalleAbierto.campus }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>🎓 Facultad:</strong>
+            <span>{{ eventoDetalleAbierto.facultad }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>👥 Cupo:</strong>
+            <span>{{ eventoDetalleAbierto.inscritosCount || 0 }} / {{ eventoDetalleAbierto.cupo }} personas</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>👤 Organizador:</strong>
+            <span>{{ eventoDetalleAbierto.creadorNombre || 'No especificado' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cerrarModalDetalle()">
+        Cerrar
+      </button>
+      <button 
+        *ngIf="!estaInscritoEnEvento(eventoDetalleAbierto!.eventoId!)"
+        class="btn-primary" 
+        (click)="cerrarModalDetalle(); abrirModalInscripcion(eventoDetalleAbierto!)"
+        [disabled]="estaEventoLleno(eventoDetalleAbierto!)">
+        {{ estaEventoLleno(eventoDetalleAbierto!) ? '🚫 Cupo Lleno' : '✅ Inscribirse Ahora' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL: INSCRIPCIÓN ========== -->
+<div *ngIf="modalInscripcionAbierto" class="modal-overlay" (click)="cerrarModalInscripcion()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Confirmar Inscripción</h2>
+      <button class="btn-close" (click)="cerrarModalInscripcion()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="eventoSeleccionado">
+      <div class="evento-detalle-modal">
+        <h3>{{ eventoSeleccionado.titulo }}</h3>
+        <p class="modal-descripcion">{{ eventoSeleccionado.descripcion }}</p>
+
+        <div class="modal-detalles">
+          <div class="modal-detalle-item">
+            <strong>📅 Fecha:</strong>
+            <span>{{ formatDate(eventoSeleccionado.fecha) }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>⏰ Horario:</strong>
+            <span>{{ eventoSeleccionado.horaInicio }} - {{ eventoSeleccionado.horaFin }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>📍 Ubicación:</strong>
+            <span>{{ eventoSeleccionado.ubicacion }}</span>
+          </div>
+          <div class="modal-detalle-item">
+            <strong>🏢 Campus:</strong>
+            <span>{{ eventoSeleccionado.campus }}</span>
+          </div>
+        </div>
+
+        <div class="modal-warning">
+          ⚠️ Al inscribirte, te comprometes a asistir al evento. Se tomarán asistencia y se certificarán las horas de vinculación.
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cerrarModalInscripcion()" [disabled]="inscribiendo">
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="confirmarInscripcion()" [disabled]="inscribiendo">
+        {{ inscribiendo ? 'Inscribiendo...' : '✅ Confirmar Inscripción' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL: FORO ========== -->
+<div *ngIf="modalForoAbierto" class="modal-overlay" (click)="cerrarModalForo()">
+  <div class="modal-content modal-foro" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>💬 Foro: {{ eventoForoSeleccionado?.titulo }}</h2>
+      <button class="btn-close" (click)="cerrarModalForo()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body modal-body-foro">
+      <!-- Mensajes -->
+      <div class="mensajes-container">
+        <div *ngIf="mensajesForo.length === 0" class="empty-mensajes">
+          <p>No hay mensajes aún. Sé el primero en comentar.</p>
+        </div>
+
+        <div *ngFor="let mensaje of mensajesForo" class="mensaje-item">
+          <div class="mensaje-avatar">
+            {{ getInitials(mensaje.nombreUsuario || '') }}
+          </div>
+          <div class="mensaje-content">
+            <div class="mensaje-header">
+              <span class="mensaje-autor">{{ mensaje.nombreUsuario }}</span>
+              <span class="mensaje-rol">{{ getRolLabel(mensaje.rolUsuario || '') }}</span>
+              <span class="mensaje-fecha">{{ mensaje.fecha | date: 'short' }}</span>
+            </div>
+            <p class="mensaje-texto">{{ mensaje.contenido }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="mensaje-form" *ngIf="!foroActivo?.cerrado">
+        <textarea
+          [(ngModel)]="nuevoMensaje"
+          placeholder="Escribe tu comentario..."
+          rows="3"
+          class="mensaje-textarea"
+          [disabled]="enviandoMensaje"></textarea>
+        <button 
+          class="btn-enviar-mensaje"
+          (click)="enviarMensajeForo()"
+          [disabled]="!nuevoMensaje.trim() || enviandoMensaje">
+          {{ enviandoMensaje ? 'Enviando...' : '📤 Enviar' }}
+        </button>
+      </div>
+
+      <div *ngIf="foroActivo?.cerrado" class="foro-cerrado">
+        🔒 Este foro ha sido cerrado
+      </div>
+    </div>
+  </div>
 </div>

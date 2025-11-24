@@ -12,7 +12,8 @@ import {
   query,
   where,
   Timestamp,
-  runTransaction
+  runTransaction,
+  deleteDoc
 } from '@angular/fire/firestore';
 import { Observable, from, map } from 'rxjs';
 import { Inscripcion, UpdateAsistenciaData } from '../models/inscripcion.model';
@@ -67,9 +68,9 @@ export class InscripcionesService {
     await this.eventosService.incrementarInscritos(eventoId);
   }
 
-  // ✅ CORREGIDO: Obtener inscripciones de un evento
+  // Obtener inscripciones de un evento
   getInscripcionesByEvento(eventoId: string): Observable<Inscripcion[]> {
-    const firestore = this.firestore; // Guardar referencia
+    const firestore = this.firestore;
     
     return from(
       (async () => {
@@ -90,9 +91,9 @@ export class InscripcionesService {
     );
   }
 
-  // ✅ CORREGIDO: Obtener inscripciones de un estudiante
+  // Obtener inscripciones de un estudiante
   getInscripcionesByEstudiante(uid: string): Observable<Inscripcion[]> {
-    const firestore = this.firestore; // Guardar referencia
+    const firestore = this.firestore;
     
     return from(
       (async () => {
@@ -113,7 +114,7 @@ export class InscripcionesService {
     );
   }
 
-  // Registrar asistencia (coordinador)
+  // ✅ CORREGIDO: Registrar asistencia (coordinador)
   async registrarAsistencia(data: UpdateAsistenciaData): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (!user) throw new Error('Usuario no autenticado');
@@ -122,16 +123,32 @@ export class InscripcionesService {
     }
 
     const docRef = doc(this.firestore, `inscripciones/${data.inscripcionId}`);
-    const inscripcionDoc = await getDoc(docRef);
     
-    if (!inscripcionDoc.exists()) {
-      throw new Error('Inscripción no encontrada');
-    }
-
-    const inscripcion = inscripcionDoc.data() as Inscripcion;
-
-    // Usar transacción para actualizar horas del estudiante
+    // ✅ SOLUCIÓN: Hacer TODAS las lecturas primero, luego TODAS las escrituras
     await runTransaction(this.firestore, async (transaction) => {
+      // 🔵 PASO 1: TODAS LAS LECTURAS PRIMERO
+      const inscripcionDoc = await transaction.get(docRef);
+      
+      if (!inscripcionDoc.exists()) {
+        throw new Error('Inscripción no encontrada');
+      }
+
+      const inscripcion = inscripcionDoc.data() as Inscripcion;
+      
+      // Leer datos del usuario si es necesario actualizar horas
+      let userDoc = null;
+      let userData = null;
+      const userRef = doc(this.firestore, `users/${inscripcion.uid}`);
+      
+      if (data.asistencia && data.horasGanadas > 0) {
+        userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) {
+          throw new Error('Usuario no encontrado');
+        }
+        userData = userDoc.data();
+      }
+
+      // 🟢 PASO 2: TODAS LAS ESCRITURAS DESPUÉS
       // Actualizar inscripción
       transaction.update(docRef, {
         asistencia: data.asistencia,
@@ -142,23 +159,40 @@ export class InscripcionesService {
       });
 
       // Si asistió, actualizar horas totales del estudiante
-      if (data.asistencia && data.horasGanadas > 0) {
-        const userRef = doc(this.firestore, `users/${inscripcion.uid}`);
-        const userDoc = await transaction.get(userRef);
-        const userData = userDoc.data();
+      if (data.asistencia && data.horasGanadas > 0 && userData) {
+        const horasActuales = userData?.['horasVinculacionTotal'] || 0;
+        const horasPrevias = inscripcion.horasGanadas || 0;
         
-        const horasTotales = (userData?.['horasVinculacionTotal'] || 0) + data.horasGanadas;
+        // Si ya tenía horas registradas, restar las viejas y sumar las nuevas
+        const nuevasHorasTotales = horasActuales - horasPrevias + data.horasGanadas;
+        
         transaction.update(userRef, {
-          horasVinculacionTotal: horasTotales
+          horasVinculacionTotal: Math.max(0, nuevasHorasTotales),
+          updatedAt: Timestamp.now()
         });
       }
     });
+
+    console.log('✅ Asistencia registrada correctamente');
   }
 
-  // Registrar asistencias múltiples
+  // ✅ MEJORADO: Registrar asistencias múltiples en lotes
   async registrarAsistenciasMultiples(asistencias: UpdateAsistenciaData[]): Promise<void> {
-    const promises = asistencias.map(data => this.registrarAsistencia(data));
-    await Promise.all(promises);
+    console.log('📝 Registrando múltiples asistencias:', asistencias.length);
+    
+    // Procesar en lotes de 10 para evitar problemas de timeout
+    const BATCH_SIZE = 10;
+    
+    for (let i = 0; i < asistencias.length; i += BATCH_SIZE) {
+      const batch = asistencias.slice(i, i + BATCH_SIZE);
+      console.log(`📦 Procesando lote ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(asistencias.length / BATCH_SIZE)}...`);
+      
+      // Procesar cada lote en paralelo
+      const promises = batch.map(data => this.registrarAsistencia(data));
+      await Promise.all(promises);
+    }
+    
+    console.log('✅ Todas las asistencias registradas exitosamente');
   }
 
   // Verificar si estudiante está inscrito
@@ -208,6 +242,51 @@ export class InscripcionesService {
     return totalHoras;
   }
 
+  // Cancelar inscripción
+  async cancelarInscripcion(inscripcionId: string): Promise<void> {
+    console.log('🗑️ Cancelando inscripción:', inscripcionId);
+    
+    const user = await this.authService.getCurrentUser();
+    if (!user) throw new Error('Usuario no autenticado');
+
+    const inscripcionRef = doc(this.firestore, `inscripciones/${inscripcionId}`);
+    const inscripcionDoc = await getDoc(inscripcionRef);
+    
+    if (!inscripcionDoc.exists()) {
+      throw new Error('Inscripción no encontrada');
+    }
+
+    const inscripcion = inscripcionDoc.data() as Inscripcion;
+
+    // Solo puede cancelar si es su propia inscripción
+    if (inscripcion.uid !== user.uid) {
+      throw new Error('No puedes cancelar esta inscripción');
+    }
+
+    // No se puede cancelar si ya asistió
+    if (inscripcion.asistencia) {
+      throw new Error('No puedes cancelar una inscripción con asistencia registrada');
+    }
+
+    // Eliminar inscripción
+    await deleteDoc(inscripcionRef);
+
+    // Decrementar contador del evento
+    const eventoRef = doc(this.firestore, `eventos/${inscripcion.eventoId}`);
+    const eventoDoc = await getDoc(eventoRef);
+    
+    if (eventoDoc.exists()) {
+      const evento = eventoDoc.data();
+      const nuevoContador = Math.max(0, (evento['inscritosCount'] || 0) - 1);
+      await updateDoc(eventoRef, {
+        inscritosCount: nuevoContador
+      });
+    }
+
+    console.log('✅ Inscripción cancelada');
+  }
+
+  // Convertir Timestamps de Firestore a Dates
   private convertTimestamps(inscripcion: any): Inscripcion {
     return {
       ...inscripcion,
