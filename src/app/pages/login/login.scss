@@ -8,6 +8,8 @@ $text-medium: #475569;
 $text-light: #64748b;
 $border-color: #e2e8f0;
 $bg-light: #fafafa;
+$error-color: #ef4444;
+$error-bg: #fef2f2;
 
 $gradient: linear-gradient(135deg, $primary-color, $secondary-color);
 $gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -25,9 +27,9 @@ $radius-md: 12px;
 $radius-lg: 20px;
 
 // ⭐ BREAKPOINTS MOBILE FIRST (min-width)
-$bp-phone-large: 480px;  // Teléfonos grandes
-$bp-tablet: 768px;        // Tablets
-$bp-desktop: 1024px;      // Desktop
+$bp-phone-large: 480px;
+$bp-tablet: 768px;
+$bp-desktop: 1024px;
 
 // Mixins
 @mixin transition($property: all) {
@@ -47,29 +49,56 @@ $bp-desktop: 1024px;      // Desktop
 }
 
 // ==========================================
+// ⭐ MENSAJE DE ERROR
+// ==========================================
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm;
+  margin-bottom: $spacing-md;
+  background: $error-bg;
+  border: 1px solid lighten($error-color, 30%);
+  border-radius: $radius-sm;
+  color: $error-color;
+  font-size: 0.9rem;
+  animation: slideDown 0.3s ease-out;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==========================================
 // LAYOUT PRINCIPAL - MOBILE FIRST
 // ==========================================
 .login-page {
   min-height: 100vh;
   background: $gradient-bg;
-  
-  // 📱 MOBILE: Estilos base (sin media query)
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: $spacing-sm; // Padding reducido en móvil
+  padding: $spacing-sm;
 
-  // 📱 PHONE LARGE (≥480px)
   @media (min-width: $bp-phone-large) {
     padding: $spacing-md;
   }
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     padding: $spacing-lg;
   }
 
-  // 💻 DESKTOP (≥1024px)
   @media (min-width: $bp-desktop) {
     padding: $spacing-xl;
   }
@@ -80,32 +109,25 @@ $bp-desktop: 1024px;      // Desktop
   background: white;
   overflow: hidden;
   @include shadow-md;
-  
-  // 📱 MOBILE: Sin bordes redondeados, ocupa toda la pantalla
   border-radius: 0;
   min-height: 100vh;
-  
-  // Grid: 1 columna en móvil
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas:
     "header"
     "form";
 
-  // 📱 PHONE LARGE (≥480px)
   @media (min-width: $bp-phone-large) {
     border-radius: $radius-md;
     min-height: auto;
     @include shadow-lg;
   }
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     border-radius: $radius-lg;
     max-width: 900px;
   }
 
-  // 💻 DESKTOP (≥1024px) - Grid 2 columnas
   @media (min-width: $bp-desktop) {
     max-width: 1200px;
     grid-template-columns: 1fr 1fr;
@@ -121,20 +143,16 @@ $bp-desktop: 1024px;      // Desktop
 .login-header {
   grid-area: header;
   border-bottom: 1px solid $border-color;
-  
-  // 📱 MOBILE: Stack vertical, centrado
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: $spacing-sm;
   padding: $spacing-md;
 
-  // 📱 PHONE LARGE (≥480px)
   @media (min-width: $bp-phone-large) {
     padding: $spacing-md $spacing-lg;
   }
 
-  // 📱 TABLET (≥768px) - Horizontal
   @media (min-width: $bp-tablet) {
     flex-direction: row;
     justify-content: space-between;
@@ -150,8 +168,6 @@ $bp-desktop: 1024px;      // Desktop
   font-weight: 600;
   text-decoration: none;
   @include transition;
-
-  // 📱 MOBILE: Full width, centrado
   width: 100%;
   justify-content: center;
   font-size: 0.9rem;
@@ -164,7 +180,6 @@ $bp-desktop: 1024px;      // Desktop
     color: $primary-color;
   }
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     width: auto;
     justify-content: flex-start;
@@ -181,7 +196,6 @@ $bp-desktop: 1024px;      // Desktop
   align-items: center;
   gap: $spacing-xs;
 
-  // 📱 MOBILE
   .logo-icon {
     font-size: 1.5rem;
   }
@@ -195,7 +209,6 @@ $bp-desktop: 1024px;      // Desktop
     background-clip: text;
   }
 
-  // 📱 PHONE LARGE (≥480px)
   @media (min-width: $bp-phone-large) {
     .logo-icon {
       font-size: 1.8rem;
@@ -215,21 +228,16 @@ $bp-desktop: 1024px;      // Desktop
   display: flex;
   flex-direction: column;
   justify-content: center;
-  
-  // 📱 MOBILE
   padding: $spacing-md;
 
-  // 📱 PHONE LARGE (≥480px)
   @media (min-width: $bp-phone-large) {
     padding: $spacing-lg;
   }
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     padding: $spacing-lg $spacing-xl;
   }
 
-  // 💻 DESKTOP (≥1024px)
   @media (min-width: $bp-desktop) {
     padding: $spacing-xl;
   }
@@ -243,21 +251,16 @@ $bp-desktop: 1024px;      // Desktop
     color: $text-dark;
     margin-bottom: $spacing-xs;
     line-height: 1.2;
-    
-    // 📱 MOBILE
     font-size: 1.5rem;
 
-    // 📱 PHONE LARGE (≥480px)
     @media (min-width: $bp-phone-large) {
       font-size: 1.75rem;
     }
 
-    // 📱 TABLET (≥768px)
     @media (min-width: $bp-tablet) {
       font-size: 2rem;
     }
 
-    // 💻 DESKTOP (≥1024px)
     @media (min-width: $bp-desktop) {
       font-size: 2.25rem;
     }
@@ -265,11 +268,8 @@ $bp-desktop: 1024px;      // Desktop
 
   .subtitle {
     color: $text-light;
-    
-    // 📱 MOBILE
     font-size: 0.875rem;
 
-    // 📱 TABLET (≥768px)
     @media (min-width: $bp-tablet) {
       font-size: 1rem;
     }
@@ -284,10 +284,8 @@ $bp-desktop: 1024px;      // Desktop
 }
 
 .form-group {
-  // 📱 MOBILE
   margin-bottom: $spacing-sm;
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     margin-bottom: $spacing-md;
   }
@@ -299,7 +297,6 @@ $bp-desktop: 1024px;      // Desktop
     font-weight: 600;
     color: $text-medium;
 
-    // 📱 TABLET (≥768px)
     @media (min-width: $bp-tablet) {
       font-size: 0.9rem;
     }
@@ -311,12 +308,9 @@ $bp-desktop: 1024px;      // Desktop
     border: 2px solid $border-color;
     border-radius: $radius-sm;
     @include transition;
-
-    // 📱 MOBILE
     padding: 0.7rem $spacing-sm;
-    font-size: 16px; // ⚠️ Importante: 16px previene zoom en iOS
+    font-size: 16px;
 
-    // 📱 PHONE LARGE (≥480px)
     @media (min-width: $bp-phone-large) {
       padding: 0.8rem $spacing-sm;
       font-size: 1rem;
@@ -331,6 +325,13 @@ $bp-desktop: 1024px;      // Desktop
     &::placeholder {
       color: #94a3b8;
     }
+
+    // ⭐ Estado disabled
+    &:disabled {
+      background: #f8fafc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 }
 
@@ -341,12 +342,9 @@ $bp-desktop: 1024px;      // Desktop
   display: flex;
   gap: $spacing-sm;
   margin-bottom: $spacing-md;
-  
-  // 📱 MOBILE: Stack vertical
   flex-direction: column;
   align-items: flex-start;
 
-  // 📱 PHONE LARGE (≥480px) - Horizontal
   @media (min-width: $bp-phone-large) {
     flex-direction: row;
     justify-content: space-between;
@@ -361,25 +359,25 @@ $bp-desktop: 1024px;      // Desktop
   gap: $spacing-xs;
   color: $text-light;
   cursor: pointer;
-  
-  // 📱 MOBILE
   font-size: 0.875rem;
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     font-size: 0.9rem;
   }
 
   input[type="checkbox"] {
-    // 📱 MOBILE: Más grande para facilitar tap
     width: 18px;
     height: 18px;
     cursor: pointer;
 
-    // 📱 TABLET (≥768px)
     @media (min-width: $bp-tablet) {
       width: 16px;
       height: 16px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
   }
 }
@@ -389,11 +387,8 @@ $bp-desktop: 1024px;      // Desktop
   color: $primary-color;
   text-decoration: none;
   @include transition(color);
-  
-  // 📱 MOBILE
   font-size: 0.875rem;
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     font-size: 0.9rem;
   }
@@ -401,6 +396,25 @@ $bp-desktop: 1024px;      // Desktop
   &:hover {
     color: darken($primary-color, 10%);
     text-decoration: underline;
+  }
+}
+
+// ==========================================
+// ⭐ SPINNER/LOADING
+// ==========================================
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -417,13 +431,10 @@ $bp-desktop: 1024px;      // Desktop
   border-radius: $radius-sm;
   cursor: pointer;
   @include transition;
-  
-  // 📱 MOBILE: Botones más grandes para tap
   padding: $spacing-sm;
   font-size: 1rem;
-  min-height: 44px; // ⚠️ Mínimo recomendado para touch
+  min-height: 44px;
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     padding: 0.8rem $spacing-md;
     min-height: auto;
@@ -437,12 +448,12 @@ $bp-desktop: 1024px;      // Desktop
     background: $gradient;
     color: white;
 
-    &:hover {
+    &:hover:not(:disabled) {
       transform: translateY(-2px);
       @include shadow-md;
     }
 
-    &:active {
+    &:active:not(:disabled) {
       transform: translateY(0);
     }
   }
@@ -452,15 +463,27 @@ $bp-desktop: 1024px;      // Desktop
     border: 2px solid $border-color;
     color: $text-light;
 
-    &:hover {
+    &:hover:not(:disabled) {
       border-color: $primary-color;
       color: $primary-color;
       transform: translateY(-2px);
     }
 
-    &:active {
+    &:active:not(:disabled) {
       transform: translateY(0);
     }
+  }
+
+  // ⭐ Estado disabled/loading
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none !important;
+  }
+
+  &.loading {
+    position: relative;
+    pointer-events: none;
   }
 }
 
@@ -470,11 +493,8 @@ $bp-desktop: 1024px;      // Desktop
 .divider {
   position: relative;
   text-align: center;
-  
-  // 📱 MOBILE
   margin: $spacing-sm 0;
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     margin: $spacing-md 0;
   }
@@ -497,7 +517,6 @@ $bp-desktop: 1024px;      // Desktop
     color: #94a3b8;
     background: white;
 
-    // 📱 TABLET (≥768px)
     @media (min-width: $bp-tablet) {
       font-size: 0.9rem;
     }
@@ -511,11 +530,8 @@ $bp-desktop: 1024px;      // Desktop
   display: grid;
   gap: $spacing-sm;
   margin-bottom: $spacing-md;
-  
-  // 📱 MOBILE: 1 columna (stack vertical)
   grid-template-columns: 1fr;
 
-  // 📱 PHONE LARGE (≥480px): 2 columnas
   @media (min-width: $bp-phone-large) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -536,11 +552,8 @@ $bp-desktop: 1024px;      // Desktop
 .register-link {
   text-align: center;
   color: $text-light;
-  
-  // 📱 MOBILE
   font-size: 0.875rem;
 
-  // 📱 TABLET (≥768px)
   @media (min-width: $bp-tablet) {
     font-size: 0.95rem;
   }
@@ -567,25 +580,19 @@ $bp-desktop: 1024px;      // Desktop
   background: $gradient;
   color: white;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  // 📱 MOBILE y TABLET: Oculto
   display: none;
 
-  // 💻 DESKTOP (≥1024px): Visible
   @media (min-width: $bp-desktop) {
     display: flex;
     padding: $spacing-lg;
+    align-items: center;
+    justify-content: center;
   }
 
-  // 💻 DESKTOP LARGE (≥1200px)
   @media (min-width: 1200px) {
     padding: $spacing-xl;
   }
 
-  // Efecto de fondo animado
   &::before {
     content: '';
     position: absolute;
@@ -607,11 +614,8 @@ $bp-desktop: 1024px;      // Desktop
     font-weight: 800;
     margin-bottom: $spacing-sm;
     line-height: 1.2;
-    
-    // 💻 DESKTOP (≥1024px)
     font-size: 2rem;
 
-    // 💻 DESKTOP LARGE (≥1200px)
     @media (min-width: 1200px) {
       font-size: 2.5rem;
     }
@@ -621,11 +625,8 @@ $bp-desktop: 1024px;      // Desktop
     opacity: 0.9;
     margin-bottom: $spacing-lg;
     line-height: 1.6;
-    
-    // 💻 DESKTOP (≥1024px)
     font-size: 1rem;
 
-    // 💻 DESKTOP LARGE (≥1200px)
     @media (min-width: 1200px) {
       font-size: 1.1rem;
     }
@@ -672,19 +673,16 @@ $bp-desktop: 1024px;      // Desktop
 // ==========================================
 // 📱 MEJORAS MOBILE ESPECÍFICAS
 // ==========================================
-
-// Prevenir zoom en inputs en iOS
 @media (max-width: 479px) {
   input[type="text"],
   input[type="email"],
   input[type="password"],
   select,
   textarea {
-    font-size: 16px !important; // Previene zoom automático
+    font-size: 16px !important;
   }
 }
 
-// Safe areas para iPhones con notch
 @supports (padding: max(0px)) {
   .login-page {
     padding-left: max($spacing-sm, env(safe-area-inset-left));

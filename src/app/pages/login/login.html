@@ -19,6 +19,16 @@
         <p class="subtitle">Ingresa tus credenciales para continuar</p>
       </div>
 
+      <!-- ⭐ Mensaje de Error -->
+      <div *ngIf="errorMessage" class="error-message">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
       <form class="login-form" (ngSubmit)="onLogin()">
         <div class="form-group">
           <label for="email">Correo Electrónico</label>
@@ -29,6 +39,7 @@
             placeholder="tu@email.com"
             [(ngModel)]="email"
             name="email"
+            [disabled]="loading"
             required>
         </div>
 
@@ -41,31 +52,54 @@
             placeholder="••••••••"
             [(ngModel)]="password"
             name="password"
+            [disabled]="loading"
             required>
         </div>
 
         <div class="form-options">
           <label class="checkbox">
-            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" [disabled]="loading">
             <span>Recordarme</span>
           </label>
           <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">
-          Iniciar Sesión
+        <!-- ⭐ Botón con Loading State -->
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading"
+          [class.loading]="loading">
+          <span class="spinner" *ngIf="loading"></span>
+          <span *ngIf="!loading">Iniciar Sesión</span>
+          <span *ngIf="loading">Iniciando sesión...</span>
         </button>
 
         <div class="divider">
           <span>o continúa con</span>
         </div>
 
+        <!-- ⭐ Botones Sociales con Loading -->
         <div class="social-buttons">
-          <button type="button" class="btn btn-social btn-google" (click)="onGoogleLogin()">
-            <i class="icon-google"></i> Google
+          <button 
+            type="button" 
+            class="btn btn-social btn-google" 
+            (click)="onGoogleLogin()"
+            [disabled]="loading"
+            [class.loading]="loading">
+            <span class="spinner" *ngIf="loading"></span>
+            <i class="icon-google" *ngIf="!loading"></i>
+            <span *ngIf="!loading">Google</span>
           </button>
-          <button type="button" class="btn btn-social btn-microsoft" (click)="onMicrosoftLogin()">
-            <i class="icon-microsoft"></i> Microsoft
+          <button 
+            type="button" 
+            class="btn btn-social btn-microsoft" 
+            (click)="onMicrosoftLogin()"
+            [disabled]="loading"
+            [class.loading]="loading">
+            <span class="spinner" *ngIf="loading"></span>
+            <i class="icon-microsoft" *ngIf="!loading"></i>
+            <span *ngIf="!loading">Microsoft</span>
           </button>
         </div>
 
