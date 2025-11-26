@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { EventosService } from '../../services/eventos.service';
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { User } from '../../models/user.model';
+import { Evento } from '../../models/evento.model';
 import { SidebarCoordinadorComponent, SeccionDashboard } from '../../components/sidebar-coordinador/sidebar-coordinador';
 import { EventosListComponent } from '../../components/eventos-list/eventos-list';
 import { EventoFormComponent } from '../../components/evento-form/evento-form';
@@ -37,6 +38,10 @@ export class DashboardCoordinadorComponent implements OnInit {
 
   currentUser: User | null = null;
   seccionActiva: SeccionDashboard = 'dashboard';
+  
+  // 🆕 Variable para mostrar el modal del foro
+  mostrarForo = false;
+  eventoSeleccionadoParaForo: Evento | null = null;
   
   // Estadísticas
   estadisticas = {
@@ -87,6 +92,20 @@ export class DashboardCoordinadorComponent implements OnInit {
     console.log('Evento creado:', eventoId);
     this.cambiarSeccion('eventos-list');
     this.cargarEstadisticas(); // Recargar stats
+  }
+
+  // 🆕 Método para abrir el foro
+  abrirForo(evento: Evento) {
+    console.log('🔵 Abriendo foro para evento:', evento.titulo);
+    this.eventoSeleccionadoParaForo = evento;
+    this.mostrarForo = true;
+  }
+
+  // 🆕 Método para cerrar el foro
+  cerrarForo() {
+    console.log('🔴 Cerrando foro');
+    this.mostrarForo = false;
+    this.eventoSeleccionadoParaForo = null;
   }
 
   logout() {

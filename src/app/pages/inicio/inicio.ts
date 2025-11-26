@@ -3,6 +3,7 @@ import { HeaderComponent } from '../../components/header/header';
 import { HeroSectionComponent } from '../../components/hero-section/hero-section';
 import { CarouselComponent } from '../../components/carousel/carousel';
 import { FooterComponent } from '../../components/footer/footer';
+import { ChatbotComponent } from '../../components/chatbot/chatbot';
 
 @Component({
   selector: 'app-inicio',
@@ -11,7 +12,8 @@ import { FooterComponent } from '../../components/footer/footer';
     HeaderComponent,
     HeroSectionComponent,
     CarouselComponent,
-    FooterComponent
+    FooterComponent,
+    ChatbotComponent
   ],
   templateUrl: './inicio.html',
   styleUrls: ['./inicio.scss']

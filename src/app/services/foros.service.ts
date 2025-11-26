@@ -12,7 +12,8 @@ import {
   query,
   where,
   orderBy,
-  Timestamp
+  Timestamp,
+  onSnapshot
 } from '@angular/fire/firestore';
 import { Observable, from, map } from 'rxjs';
 import { Foro, MensajeForo, CreateMensajeData } from '../models/foro.model';
@@ -72,29 +73,31 @@ export class ForosService {
     }) as Foro;
   }
 
-  // Agregar mensaje al foro
+  // ✅ MODIFICADO: Agregar mensaje sin campos undefined
   async agregarMensaje(foroId: string, data: CreateMensajeData): Promise<void> {
     const user = await this.authService.getCurrentUser();
     if (!user) throw new Error('Usuario no autenticado');
 
     const mensajesCollection = collection(this.firestore, `foros/${foroId}/mensajes`);
     
-    const mensaje: MensajeForo = {
+    // Crear objeto base sin campos undefined
+    const mensajeData: any = {
       foroId,
       uid: user.uid,
       nombreUsuario: `${user.nombre} ${user.apellido || ''}`.trim(),
       rolUsuario: user.rol,
-      fotoUsuario: user.fotoUrl,
       contenido: data.contenido,
-      fecha: new Date(),
+      fecha: Timestamp.now(),
       editado: false,
       eliminado: false
     };
 
-    await addDoc(mensajesCollection, {
-      ...mensaje,
-      fecha: Timestamp.now()
-    });
+    // Solo agregar fotoUsuario si existe
+    if (user.fotoUrl) {
+      mensajeData.fotoUsuario = user.fotoUrl;
+    }
+
+    await addDoc(mensajesCollection, mensajeData);
 
     // Incrementar contador de mensajes
     const foroRef = doc(this.firestore, `foros/${foroId}`);
@@ -108,27 +111,40 @@ export class ForosService {
     }
   }
 
-  // ✅ CORREGIDO: Obtener mensajes del foro
+  // ✅ MODIFICADO: Obtener mensajes en tiempo real con onSnapshot
   getMensajesByForo(foroId: string): Observable<MensajeForo[]> {
-    const firestore = this.firestore; // Guardar referencia
-    
-    return from(
-      (async () => {
-        const mensajesCollection = collection(firestore, `foros/${foroId}/mensajes`);
-        const q = query(mensajesCollection, orderBy('fecha', 'asc'));
-        
-        const snapshot = await getDocs(q);
-        return snapshot.docs
-          .map(doc => {
-            const data = doc.data();
-            return this.convertTimestamps({
-              ...data,
-              mensajeId: doc.id
-            });
-          })
-          .filter(m => !m.eliminado);
-      })()
-    );
+    return new Observable<MensajeForo[]>(subscriber => {
+      const mensajesCollection = collection(this.firestore, `foros/${foroId}/mensajes`);
+      const q = query(mensajesCollection, orderBy('fecha', 'asc'));
+      
+      // Escuchar cambios en tiempo real
+      const unsubscribe = onSnapshot(q, 
+        (snapshot) => {
+          const mensajes = snapshot.docs
+            .map(doc => {
+              const data = doc.data();
+              return this.convertTimestamps({
+                ...data,
+                mensajeId: doc.id
+              });
+            })
+            .filter(m => !m.eliminado);
+          
+          console.log('🔥 Snapshot actualizado:', mensajes.length, 'mensajes');
+          subscriber.next(mensajes);
+        },
+        (error) => {
+          console.error('❌ Error en listener de mensajes:', error);
+          subscriber.error(error);
+        }
+      );
+      
+      // Cleanup cuando el observable se desuscriba
+      return () => {
+        console.log('🧹 Deteniendo listener de mensajes');
+        unsubscribe();
+      };
+    });
   }
 
   // Eliminar mensaje (moderador)

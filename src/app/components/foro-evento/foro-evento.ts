@@ -1,6 +1,6 @@
 // src/app/components/foro-evento/foro-evento.component.ts
 
-import { Component, OnInit, inject, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventosService } from '../../services/eventos.service';
@@ -17,8 +17,8 @@ import { User } from '../../models/user.model';
   template: `
     <div class="foro-container">
       
-      <!-- Selección de evento -->
-      <div class="evento-selector">
+      <!-- Selección de evento (solo si NO hay evento preseleccionado) -->
+      <div *ngIf="!eventoPreseleccionado" class="evento-selector">
         <h3>Selecciona un Evento para ver su Foro</h3>
         <select 
           [(ngModel)]="eventoSeleccionadoId"
@@ -128,7 +128,7 @@ import { User } from '../../models/user.model';
       </div>
 
       <!-- Sin evento seleccionado -->
-      <div *ngIf="!loading && !eventoSeleccionado" class="empty-state">
+      <div *ngIf="!loading && !eventoSeleccionado && !eventoPreseleccionado" class="empty-state">
         <div class="empty-icon">💬</div>
         <h3>Selecciona un Evento</h3>
         <p>Elige un evento para ver y participar en su foro de discusión</p>
@@ -540,8 +540,9 @@ import { User } from '../../models/user.model';
     }
   `]
 })
-export class ForoEventoComponent implements OnInit {
+export class ForoEventoComponent implements OnInit, OnChanges, OnDestroy {
   @Input() coordinadorUid: string = '';
+  @Input() eventoPreseleccionado: Evento | null = null;
 
   private eventosService = inject(EventosService);
   private forosService = inject(ForosService);
@@ -555,6 +556,9 @@ export class ForoEventoComponent implements OnInit {
   currentUser: User | null = null;
   nuevoMensaje = '';
   
+  // ✅ NUEVO: Guardar suscripción
+  private mensajesSub?: any;
+  
   loading = false;
   enviandoMensaje = false;
   guardando = false;
@@ -563,12 +567,38 @@ export class ForoEventoComponent implements OnInit {
   errorMessage = '';
 
   ngOnInit() {
+    console.log('🔵 ForoEvento ngOnInit');
+    console.log('🔵 Evento preseleccionado:', this.eventoPreseleccionado?.titulo);
+    
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       this.esCoordinador = user?.rol === 'coordinador' || user?.rol === 'admin';
     });
 
-    this.cargarEventos();
+    if (this.eventoPreseleccionado) {
+      this.eventoSeleccionado = this.eventoPreseleccionado;
+      this.eventoSeleccionadoId = this.eventoPreseleccionado.eventoId || '';
+      this.cargarForo();
+    } else {
+      this.cargarEventos();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['eventoPreseleccionado'] && changes['eventoPreseleccionado'].currentValue) {
+      console.log('🔵 Evento preseleccionado cambió');
+      this.eventoSeleccionado = this.eventoPreseleccionado;
+      this.eventoSeleccionadoId = this.eventoPreseleccionado?.eventoId || '';
+      this.cargarForo();
+    }
+  }
+
+  // ✅ NUEVO: Limpiar al destruir
+  ngOnDestroy() {
+    console.log('🧹 Limpiando suscripciones del foro');
+    if (this.mensajesSub) {
+      this.mensajesSub.unsubscribe();
+    }
   }
 
   cargarEventos() {
@@ -595,33 +625,46 @@ export class ForoEventoComponent implements OnInit {
   }
 
   async cargarForo() {
+    console.log('🔵 Cargando foro para evento:', this.eventoSeleccionadoId);
     this.loading = true;
     try {
       this.foro = await this.forosService.getForoByEvento(this.eventoSeleccionadoId);
       
       if (this.foro) {
+        console.log('✅ Foro encontrado:', this.foro.foroId);
         this.cargarMensajes();
       } else {
+        console.warn('⚠️ No se encontró el foro para este evento');
         this.errorMessage = 'No se encontró el foro para este evento';
         this.loading = false;
       }
     } catch (error) {
-      console.error('Error cargando foro:', error);
+      console.error('❌ Error cargando foro:', error);
       this.errorMessage = 'Error al cargar el foro';
       this.loading = false;
     }
   }
 
+  // ✅ MODIFICADO: Ahora con suscripción en tiempo real
   cargarMensajes() {
     if (!this.foro) return;
 
-    this.forosService.getMensajesByForo(this.foro.foroId!).subscribe({
+    console.log('🔵 Cargando mensajes del foro:', this.foro.foroId);
+    
+    // Limpiar suscripción anterior si existe
+    if (this.mensajesSub) {
+      this.mensajesSub.unsubscribe();
+    }
+    
+    // Nueva suscripción en tiempo real
+    this.mensajesSub = this.forosService.getMensajesByForo(this.foro.foroId!).subscribe({
       next: (mensajes) => {
+        console.log('✅ Mensajes actualizados en tiempo real:', mensajes.length);
         this.mensajes = mensajes;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error cargando mensajes:', error);
+        console.error('❌ Error cargando mensajes:', error);
         this.loading = false;
       }
     });
@@ -680,10 +723,11 @@ export class ForoEventoComponent implements OnInit {
   }
 
   getInitials(nombre: string): string {
+    if (!nombre) return 'U';
     const nombres = nombre.trim().split(' ');
     return nombres.length > 1 
-      ? nombres[0][0] + nombres[1][0]
-      : nombres[0][0];
+      ? (nombres[0][0] || '') + (nombres[1][0] || '')
+      : nombres[0][0] || 'U';
   }
 
   getRolLabel(rol: string): string {

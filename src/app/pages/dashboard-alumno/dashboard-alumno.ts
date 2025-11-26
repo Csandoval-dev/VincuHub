@@ -33,7 +33,7 @@ export class DashboardAlumnoComponent implements OnInit {
   // Eventos
   eventosDisponibles: Evento[] = [];
   eventosFiltrados: Evento[] = [];
-  eventosInscritosIds: Set<string> = new Set(); // ✅ NUEVO: IDs de eventos inscritos
+  eventosInscritosIds: Set<string> = new Set();
   searchTerm = '';
   filtroTipo = '';
   filtroCampus = '';
@@ -55,12 +55,12 @@ export class DashboardAlumnoComponent implements OnInit {
   loadingEventos = false;
   loadingInscripciones = false;
   eventoSeleccionado: Evento | null = null;
-  eventoDetalleAbierto: Evento | null = null; // ✅ NUEVO: Para modal de detalles
+  eventoDetalleAbierto: Evento | null = null;
   modalInscripcionAbierto = false;
-  modalDetalleAbierto = false; // ✅ NUEVO
+  modalDetalleAbierto = false;
   modalForoAbierto = false;
   inscribiendo = false;
-  cancelandoInscripcion = false; // ✅ NUEVO
+  cancelandoInscripcion = false;
   enviandoMensaje = false;
 
   // Estadísticas
@@ -102,16 +102,15 @@ export class DashboardAlumnoComponent implements OnInit {
     
     this.eventosService.getEventosPublicados(this.currentUser?.campus).subscribe({
       next: (eventos) => {
-        // Filtrar solo eventos futuros y publicados
         const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0); // Resetear hora para comparar solo fechas
+        hoy.setHours(0, 0, 0, 0);
         
         this.eventosDisponibles = eventos
           .filter(evento => 
             evento.estado === 'publicado' && 
             new Date(evento.fecha) >= hoy
           )
-          .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()); // Ordenar por fecha ascendente
+          .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         
         this.eventosFiltrados = this.eventosDisponibles;
         this.loadingEventos = false;
@@ -144,12 +143,9 @@ export class DashboardAlumnoComponent implements OnInit {
     this.inscripcionesService.getInscripcionesByEstudiante(this.currentUser.uid).subscribe({
       next: async (inscripciones) => {
         this.misInscripciones = inscripciones;
-        
-        // ✅ NUEVO: Guardar IDs de eventos inscritos
         this.eventosInscritosIds = new Set(inscripciones.map(i => i.eventoId));
         console.log('📋 Eventos inscritos (IDs):', Array.from(this.eventosInscritosIds));
         
-        // Cargar detalles de eventos inscritos
         const eventosPromises = inscripciones.map(insc => 
           this.eventosService.getEventoById(insc.eventoId).toPromise()
         );
@@ -157,7 +153,6 @@ export class DashboardAlumnoComponent implements OnInit {
         const eventos = await Promise.all(eventosPromises);
         const eventosValidos = eventos.filter(e => e !== null) as Evento[];
         
-        // Separar inscritos y completados
         this.eventosInscritos = eventosValidos.filter(e => 
           new Date(e.fecha) >= new Date() && e.estado !== 'finalizado'
         );
@@ -177,39 +172,31 @@ export class DashboardAlumnoComponent implements OnInit {
 
   async abrirModalInscripcion(evento: Evento) {
     console.log('🎯 Intentando abrir modal de inscripción para:', evento.titulo);
-    console.log('👤 Usuario actual:', this.currentUser);
     
     if (!this.currentUser) {
-      console.error('❌ No hay usuario autenticado');
       alert('Debes iniciar sesión para inscribirte');
       return;
     }
 
     try {
-      // Verificar si ya está inscrito
-      console.log('🔍 Verificando si ya está inscrito...');
       const yaInscrito = await this.inscripcionesService.estaInscrito(
         this.currentUser.uid,
         evento.eventoId!
       );
-      console.log('✅ Ya inscrito:', yaInscrito);
 
       if (yaInscrito) {
         alert('Ya estás inscrito en este evento');
         return;
       }
 
-      // Verificar cupo
       const inscritosCount = evento.inscritosCount ?? 0;
       const cupo = evento.cupo ?? 0;
-      console.log(`📊 Cupo: ${inscritosCount}/${cupo}`);
 
       if (cupo > 0 && inscritosCount >= cupo) {
         alert('Este evento ya no tiene cupo disponible');
         return;
       }
 
-      console.log('✅ Abriendo modal de inscripción');
       this.eventoSeleccionado = evento;
       this.modalInscripcionAbierto = true;
     } catch (error) {
@@ -220,36 +207,24 @@ export class DashboardAlumnoComponent implements OnInit {
 
   async confirmarInscripcion() {
     if (!this.eventoSeleccionado || !this.currentUser) {
-      console.error('❌ Falta evento o usuario:', {
-        evento: this.eventoSeleccionado,
-        user: this.currentUser
-      });
       alert('Error: Datos incompletos');
       return;
     }
 
     this.inscribiendo = true;
-    console.log('📝 Iniciando inscripción...');
-    console.log('- Usuario:', this.currentUser.uid);
-    console.log('- Evento:', this.eventoSeleccionado.eventoId);
 
     try {
       await this.inscripcionesService.inscribirEstudiante(this.eventoSeleccionado.eventoId!);
       
-      console.log('✅ Inscripción exitosa');
       alert('¡Inscripción exitosa!');
       this.cerrarModalInscripcion();
       
-      // Recargar datos
-      console.log('🔄 Recargando datos...');
       await this.cargarEventosDisponibles();
       await this.cargarMisInscripciones();
       this.calcularEstadisticas();
-      console.log('✅ Datos recargados');
       
     } catch (error: any) {
       console.error('❌ Error al inscribirse:', error);
-      console.error('❌ Stack:', error.stack);
       alert(error.message || 'Error al inscribirse en el evento');
     } finally {
       this.inscribiendo = false;
@@ -261,103 +236,24 @@ export class DashboardAlumnoComponent implements OnInit {
     this.eventoSeleccionado = null;
   }
 
-  // ==================== FOROS ====================
-  
-  async abrirForo(evento: Evento) {
-    this.eventoForoSeleccionado = evento;
-    this.modalForoAbierto = true;
-    
-    try {
-      // Cargar foro del evento
-      this.foroActivo = await this.forosService.getForoByEvento(evento.eventoId!);
-      
-      if (this.foroActivo) {
-        // Cargar mensajes
-        this.forosService.getMensajesByForo(this.foroActivo.foroId!).subscribe({
-          next: (mensajes) => {
-            this.mensajesForo = mensajes;
-          },
-          error: (error) => {
-            console.error('Error cargando mensajes:', error);
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error cargando foro:', error);
-      alert('No se pudo cargar el foro de este evento');
-    }
-  }
-
-  cerrarModalForo() {
-    this.modalForoAbierto = false;
-    this.eventoForoSeleccionado = null;
-    this.foroActivo = null;
-    this.mensajesForo = [];
-    this.nuevoMensaje = '';
-  }
-
-  async enviarMensajeForo() {
-    if (!this.nuevoMensaje.trim() || !this.foroActivo) return;
-
-    this.enviandoMensaje = true;
-
-    try {
-      await this.forosService.agregarMensaje(this.foroActivo.foroId!, {
-        contenido: this.nuevoMensaje.trim()
-      });
-
-      this.nuevoMensaje = '';
-      
-    } catch (error: any) {
-      console.error('Error enviando mensaje:', error);
-      alert(error.message || 'Error al enviar el mensaje');
-    } finally {
-      this.enviandoMensaje = false;
-    }
-  }
-
-  // ==================== UTILIDADES ====================
-  
-  // ✅ NUEVO: Verificar si está inscrito en un evento
-  estaInscritoEnEvento(eventoId: string): boolean {
-    return this.eventosInscritosIds.has(eventoId);
-  }
-
-  // ✅ NUEVO: Abrir modal de detalles
-  verDetallesEvento(evento: Evento) {
-    this.eventoDetalleAbierto = evento;
-    this.modalDetalleAbierto = true;
-  }
-
-  // ✅ NUEVO: Cerrar modal de detalles
-  cerrarModalDetalle() {
-    this.modalDetalleAbierto = false;
-    this.eventoDetalleAbierto = null;
-  }
-
-  // ✅ NUEVO: Cancelar inscripción
   async cancelarInscripcion(eventoId: string) {
     if (!confirm('¿Estás seguro de cancelar tu inscripción a este evento?')) {
       return;
     }
 
     this.cancelandoInscripcion = true;
-    console.log('🗑️ Cancelando inscripción del evento:', eventoId);
 
     try {
-      // Buscar la inscripción
       const inscripcion = this.misInscripciones.find(i => i.eventoId === eventoId);
       
       if (!inscripcion || !inscripcion.inscripcionId) {
         throw new Error('No se encontró la inscripción');
       }
 
-      // Eliminar inscripción (necesitarás crear este método en el service)
       await this.inscripcionesService.cancelarInscripcion(inscripcion.inscripcionId);
       
       alert('Inscripción cancelada exitosamente');
       
-      // Recargar datos
       await this.cargarEventosDisponibles();
       await this.cargarMisInscripciones();
       this.calcularEstadisticas();
@@ -368,6 +264,107 @@ export class DashboardAlumnoComponent implements OnInit {
     } finally {
       this.cancelandoInscripcion = false;
     }
+  }
+
+  // ==================== FOROS ====================
+  
+  async abrirForo(evento: Evento) {
+    console.log('💬 Abriendo foro para:', evento.titulo);
+    
+    this.eventoForoSeleccionado = evento;
+    this.modalForoAbierto = true;
+    this.mensajesForo = []; // Limpiar mensajes anteriores
+    
+    try {
+      // Cargar foro del evento
+      console.log('🔍 Buscando foro para evento:', evento.eventoId);
+      this.foroActivo = await this.forosService.getForoByEvento(evento.eventoId!);
+      
+      if (!this.foroActivo) {
+        console.warn('⚠️ No se encontró el foro para este evento');
+        alert('Este evento aún no tiene un foro creado');
+        this.cerrarModalForo();
+        return;
+      }
+
+      console.log('✅ Foro encontrado:', this.foroActivo.foroId);
+      
+      // Cargar mensajes del foro
+      this.forosService.getMensajesByForo(this.foroActivo.foroId!).subscribe({
+        next: (mensajes) => {
+          console.log('✅ Mensajes cargados:', mensajes.length);
+          this.mensajesForo = mensajes;
+        },
+        error: (error) => {
+          console.error('❌ Error cargando mensajes:', error);
+          alert('Error al cargar los mensajes del foro');
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error cargando foro:', error);
+      alert('No se pudo cargar el foro de este evento');
+      this.cerrarModalForo();
+    }
+  }
+
+  cerrarModalForo() {
+    console.log('🔴 Cerrando modal del foro');
+    this.modalForoAbierto = false;
+    this.eventoForoSeleccionado = null;
+    this.foroActivo = null;
+    this.mensajesForo = [];
+    this.nuevoMensaje = '';
+  }
+
+  async enviarMensajeForo() {
+    if (!this.nuevoMensaje.trim()) {
+      alert('Escribe un mensaje');
+      return;
+    }
+
+    if (!this.foroActivo) {
+      alert('No hay un foro activo');
+      return;
+    }
+
+    if (this.foroActivo.cerrado) {
+      alert('Este foro está cerrado');
+      return;
+    }
+
+    this.enviandoMensaje = true;
+    console.log('📤 Enviando mensaje al foro:', this.foroActivo.foroId);
+
+    try {
+      await this.forosService.agregarMensaje(this.foroActivo.foroId!, {
+        contenido: this.nuevoMensaje.trim()
+      });
+
+      console.log('✅ Mensaje enviado correctamente');
+      this.nuevoMensaje = '';
+      
+    } catch (error: any) {
+      console.error('❌ Error enviando mensaje:', error);
+      alert(error.message || 'Error al enviar el mensaje');
+    } finally {
+      this.enviandoMensaje = false;
+    }
+  }
+
+  // ==================== UTILIDADES ====================
+  
+  estaInscritoEnEvento(eventoId: string): boolean {
+    return this.eventosInscritosIds.has(eventoId);
+  }
+
+  verDetallesEvento(evento: Evento) {
+    this.eventoDetalleAbierto = evento;
+    this.modalDetalleAbierto = true;
+  }
+
+  cerrarModalDetalle() {
+    this.modalDetalleAbierto = false;
+    this.eventoDetalleAbierto = null;
   }
   
   calcularEstadisticas() {
@@ -416,10 +413,11 @@ export class DashboardAlumnoComponent implements OnInit {
   }
 
   getInitials(nombre: string): string {
+    if (!nombre) return 'U';
     const nombres = nombre.trim().split(' ');
     return nombres.length > 1 
-      ? nombres[0][0] + nombres[1][0]
-      : nombres[0][0];
+      ? (nombres[0][0] || '') + (nombres[1][0] || '')
+      : nombres[0][0] || 'U';
   }
 
   getRolLabel(rol: string): string {
@@ -435,14 +433,12 @@ export class DashboardAlumnoComponent implements OnInit {
     this.vistaActiva = vista;
   }
 
-  // Verificar si el evento está lleno
   estaEventoLleno(evento: Evento): boolean {
     const inscritos = evento.inscritosCount ?? 0;
     const cupo = evento.cupo ?? 0;
     return cupo > 0 && inscritos >= cupo;
   }
 
-  // Obtener texto del botón de inscripción
   getTextoBotonInscripcion(evento: Evento): string {
     if (this.estaInscritoEnEvento(evento.eventoId!)) {
       return '✅ Ya Inscrito';
@@ -450,7 +446,6 @@ export class DashboardAlumnoComponent implements OnInit {
     return this.estaEventoLleno(evento) ? '🚫 Cupo Lleno' : '📝 Inscribirse';
   }
 
-  // ✅ NUEVO: Determinar si el botón debe estar deshabilitado
   debeDeshabilitarBoton(evento: Evento): boolean {
     return this.estaEventoLleno(evento) || this.estaInscritoEnEvento(evento.eventoId!);
   }
