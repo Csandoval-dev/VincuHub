@@ -1,20 +1,13 @@
 // src/app/services/chatbot.service.ts
-
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable, BehaviorSubject, of, delay } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { ChatMessage, ChatGPTRequest, ChatGPTResponse, ChatBotConfig } from '../models/chat.model';
-import { environment } from '../../environments/environment';
+import { ChatMessage, PreguntaFrecuente, ChatBotConfig } from '../models/chat.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatbotService {
-  private readonly OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-  // Importar desde environment
-  private readonly OPENAI_API_KEY = environment.firebase.openaiApiKey;
-
   private mensajesSubject = new BehaviorSubject<ChatMessage[]>([]);
   public mensajes$ = this.mensajesSubject.asObservable();
 
@@ -30,27 +23,29 @@ export class ChatbotService {
       { pregunta: '¿Cómo cancelo una inscripción?', categoria: 'eventos' },
       { pregunta: '¿Quién puede crear eventos?', categoria: 'general' }
     ],
-    sistemaPrompt: `Eres VincuHub Assistant, un asistente virtual amigable y profesional de la plataforma VincuHub de CEUTEC (Centro Universitario Tecnológico).
-Tu función es ayudar a estudiantes, coordinadores y administradores con la plataforma de gestión de eventos y horas de vinculación.
-
-INFORMACIÓN CLAVE:
-- CEUTEC es una institución educativa con campus en San Pedro Sula, Tegucigalpa y La Ceiba
-- La plataforma permite gestionar eventos, actividades y ferias universitarias
-- Los estudiantes deben completar 60 horas de vinculación
-- Los estudiantes pueden inscribirse en eventos y ver su historial
-- Los coordinadores pueden crear y gestionar eventos
-- Los administradores tienen control total del sistema
-
-RESPONDE DE MANERA:
-- Clara y concisa
-- Profesional pero amigable
-- En español
-- Con pasos numerados cuando sea apropiado
-- Sugiriendo secciones específicas de la plataforma cuando sea relevante
-
-Si no sabes algo, admítelo y sugiere contactar al soporte técnico o coordinador.`
+    sistemaPrompt: ''
   };
-  constructor(private http: HttpClient) {
+
+  // ⚡ RESPUESTAS SIMULADAS (Base de conocimiento temporal)
+  private respuestasSimuladas: { [key: string]: string } = {
+    'inscribo': 'Para inscribirte en un evento:\n\n1️⃣ Ve a la sección "Eventos" en el menú principal\n2️⃣ Busca el evento que te interesa\n3️⃣ Haz clic en "Ver Detalles"\n4️⃣ Presiona el botón "Inscribirse"\n5️⃣ Confirma tu inscripción\n\n✅ Recibirás una confirmación por correo electrónico.',
+    
+    'vinculación': 'Las horas de vinculación funcionan así:\n\n📌 Necesitas completar 60 horas totales\n📌 Cada evento tiene horas asignadas\n📌 Al participar en eventos, acumulas horas\n📌 Puedes ver tu progreso en "Mi Perfil"\n📌 Las horas se validan después de cada evento\n\n¿Necesitas más información sobre algún punto específico?',
+    
+    'eventos inscritos': 'Para ver tus eventos inscritos:\n\n1️⃣ Ve a "Mi Perfil" en el menú\n2️⃣ Haz clic en la pestaña "Mis Eventos"\n3️⃣ Verás dos secciones:\n   • Eventos Próximos\n   • Historial de Eventos\n\nAllí puedes ver todos los detalles de tus inscripciones.',
+    
+    'cancelo': 'Para cancelar una inscripción:\n\n1️⃣ Ve a "Mi Perfil" > "Mis Eventos"\n2️⃣ Busca el evento que quieres cancelar\n3️⃣ Haz clic en "Ver Detalles"\n4️⃣ Presiona "Cancelar Inscripción"\n\n⚠️ Importante: Solo puedes cancelar con al menos 24 horas de anticipación al evento.',
+    
+    'crear eventos': 'Pueden crear eventos:\n\n👤 Coordinadores: Pueden crear y gestionar eventos de su área\n👤 Administradores: Tienen acceso completo al sistema\n\n🚫 Los estudiantes NO pueden crear eventos, solo inscribirse.\n\n¿Eres coordinador y necesitas ayuda para crear un evento?',
+    
+    'hola': '¡Hola! 👋 ¿En qué puedo ayudarte hoy? Puedo asistirte con:\n\n• Inscripción en eventos\n• Horas de vinculación\n• Gestión de perfil\n• Creación de eventos (coordinadores)\n• Cualquier duda sobre la plataforma',
+    
+    'ayuda': 'Claro, aquí está lo que puedo hacer por ti:\n\n📅 Eventos:\n• Cómo inscribirse\n• Ver eventos disponibles\n• Cancelar inscripciones\n\n⏱️ Horas de Vinculación:\n• Consultar progreso\n• Entender el sistema\n\n👤 Perfil:\n• Gestionar información\n• Ver historial\n\n¿Sobre qué tema necesitas ayuda específica?',
+    
+    'default': 'Entiendo tu pregunta. Basándome en la información de VincuHub:\n\n• Puedes explorar los eventos disponibles en la sección "Eventos"\n• Consulta tu progreso de horas en "Mi Perfil"\n• Si tienes dudas específicas, no dudes en preguntar\n\n¿Hay algo más específico en lo que pueda ayudarte?'
+  };
+
+  constructor() {
     this.inicializarChat();
   }
 
@@ -76,7 +71,7 @@ Si no sabes algo, admítelo y sugiere contactar al soporte técnico o coordinado
     this.chatAbiertoSubject.next(true);
   }
 
-  obtenerPreguntasFrecuentes() {
+  obtenerPreguntasFrecuentes(): PreguntaFrecuente[] {
     return this.config.preguntasFrecuentes;
   }
 
@@ -102,8 +97,9 @@ Si no sabes algo, admítelo y sugiere contactar al soporte técnico o coordinado
     };
     this.mensajesSubject.next([...this.mensajesSubject.value, mensajeTemp]);
 
-    // Llamar a la API de ChatGPT
-    return this.llamarChatGPT(contenido).pipe(
+    // ⚡ Simular respuesta inteligente
+    return this.obtenerRespuestaSimulada(contenido).pipe(
+      delay(1000 + Math.random() * 1000), // Delay realista de 1-2 segundos
       map(respuesta => {
         // Remover mensaje temporal
         const sinTemp = this.mensajesSubject.value.filter(m => m.id !== 'temp');
@@ -121,7 +117,6 @@ Si no sabes algo, admítelo y sugiere contactar al soporte técnico o coordinado
       catchError(error => {
         console.error('Error al obtener respuesta del bot:', error);
         
-        // Remover mensaje temporal
         const sinTemp = this.mensajesSubject.value.filter(m => m.id !== 'temp');
         
         const mensajeError: ChatMessage = {
@@ -137,35 +132,19 @@ Si no sabes algo, admítelo y sugiere contactar al soporte técnico o coordinado
     );
   }
 
-  private llamarChatGPT(mensaje: string): Observable<string> {
-    // Construir historial de conversación
-    const mensajesHistorial = this.mensajesSubject.value
-      .filter(m => !m.enviando && m.id !== 'temp')
-      .slice(-10) // Solo últimos 10 mensajes para no exceder tokens
-      .map(m => ({
-        role: m.esUsuario ? 'user' as const : 'assistant' as const,
-        content: m.contenido
-      }));
-
-    const request: ChatGPTRequest = {
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: this.config.sistemaPrompt },
-        ...mensajesHistorial,
-        { role: 'user', content: mensaje }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    };
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.OPENAI_API_KEY}`
-    });
-
-    return this.http.post<ChatGPTResponse>(this.OPENAI_API_URL, request, { headers }).pipe(
-      map(response => response.choices[0].message.content)
-    );
+  // ⚡ NUEVO: Obtener respuesta simulada basada en palabras clave
+  private obtenerRespuestaSimulada(mensaje: string): Observable<string> {
+    const mensajeNormalizado = mensaje.toLowerCase().trim();
+    
+    // Buscar palabra clave en el mensaje
+    for (const [clave, respuesta] of Object.entries(this.respuestasSimuladas)) {
+      if (mensajeNormalizado.includes(clave)) {
+        return of(respuesta);
+      }
+    }
+    
+    // Respuesta por defecto
+    return of(this.respuestasSimuladas['default']);
   }
 
   limpiarChat(): void {
