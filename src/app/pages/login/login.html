@@ -1,37 +1,67 @@
 <div class="login-page">
   <div class="login-container">
     
+    <!-- Skip Link para navegación con teclado -->
+    <a href="#main-form" class="skip-link">Saltar al formulario de inicio de sesión</a>
+    
     <!-- Logo y volver -->
-    <div class="login-header">
-      <a routerLink="/inicio" class="back-button">
-        <span class="arrow">←</span> Volver al inicio
-      </a>
-      <div class="logo">
-        <i class="logo-icon">🎓</i>
+    <header class="login-header">
+      <nav aria-label="Navegación secundaria">
+        <a routerLink="/inicio" class="back-button" aria-label="Volver a la página de inicio">
+          <span class="arrow" aria-hidden="true">←</span> 
+          <span>Volver al inicio</span>
+        </a>
+      </nav>
+      <div class="logo" role="img" aria-label="Vincu Hub - Logotipo">
+        <span class="logo-icon" aria-hidden="true">🎓</span>
         <span class="logo-text">Vincu Hub</span>
       </div>
-    </div>
+    </header>
 
     <!-- Formulario -->
-    <div class="login-card">
+    <main class="login-card">
       <div class="card-header">
-        <h1 class="title">Bienvenido de nuevo</h1>
+        <h1 class="title" id="page-title">Bienvenido de nuevo</h1>
         <p class="subtitle">Ingresa tus credenciales para continuar</p>
       </div>
 
-      <!-- ⭐ Mensaje de Error -->
-      <div *ngIf="errorMessage" class="error-message">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <!-- ⭐ Mensaje de Error Accesible -->
+      <div 
+        *ngIf="errorMessage" 
+        class="error-message" 
+        role="alert" 
+        aria-live="assertive"
+        aria-atomic="true"
+        id="login-error">
+        <svg 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2"
+          aria-hidden="true"
+          focusable="false">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        {{ errorMessage }}
+        <span>{{ errorMessage }}</span>
       </div>
 
-      <form class="login-form" (ngSubmit)="onLogin()">
+      <form 
+        class="login-form" 
+        (ngSubmit)="onLogin()" 
+        id="main-form"
+        novalidate
+        [attr.aria-describedby]="errorMessage ? 'login-error' : null">
+        
+        <!-- Campo Email -->
         <div class="form-group">
-          <label for="email">Correo Electrónico</label>
+          <label for="email" id="email-label">
+            Correo Electrónico 
+            <span class="required" aria-label="campo obligatorio">*</span>
+          </label>
           <input 
             type="email" 
             id="email" 
@@ -40,55 +70,122 @@
             [(ngModel)]="email"
             name="email"
             [disabled]="loading"
-            required>
+            required
+            autocomplete="email"
+            aria-required="true"
+            aria-labelledby="email-label"
+            [attr.aria-describedby]="emailError ? 'email-error' : null"
+            [attr.aria-invalid]="emailError ? 'true' : 'false'"
+            (blur)="validateEmail()">
+          <span 
+            *ngIf="emailError" 
+            id="email-error" 
+            class="field-error" 
+            role="alert"
+            aria-live="polite">
+            {{ emailError }}
+          </span>
         </div>
 
+        <!-- Campo Contraseña -->
         <div class="form-group">
-          <label for="password">Contraseña</label>
-          <input 
-            type="password" 
-            id="password" 
-            class="form-control" 
-            placeholder="••••••••"
-            [(ngModel)]="password"
-            name="password"
-            [disabled]="loading"
-            required>
-        </div>
-
-        <div class="form-options">
-          <label class="checkbox">
-            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" [disabled]="loading">
-            <span>Recordarme</span>
+          <label for="password" id="password-label">
+            Contraseña 
+            <span class="required" aria-label="campo obligatorio">*</span>
           </label>
-          <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+          <div class="password-wrapper">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password" 
+              class="form-control" 
+              placeholder="••••••••"
+              [(ngModel)]="password"
+              name="password"
+              [disabled]="loading"
+              required
+              autocomplete="current-password"
+              aria-required="true"
+              aria-labelledby="password-label"
+              [attr.aria-describedby]="passwordError ? 'password-error' : 'password-requirements'"
+              [attr.aria-invalid]="passwordError ? 'true' : 'false'"
+              (blur)="validatePassword()">
+            <button 
+              type="button" 
+              class="toggle-password"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="showPassword"
+              [disabled]="loading"
+              tabindex="0">
+              <span aria-hidden="true">{{ showPassword ? '👁️' : '👁️‍🗨️' }}</span>
+            </button>
+          </div>
+          <span 
+            id="password-requirements" 
+            class="field-hint"
+            *ngIf="!passwordError">
+            Mínimo 8 caracteres
+          </span>
+          <span 
+            *ngIf="passwordError" 
+            id="password-error" 
+            class="field-error" 
+            role="alert"
+            aria-live="polite">
+            {{ passwordError }}
+          </span>
         </div>
 
-        <!-- ⭐ Botón con Loading State -->
+        <!-- Opciones del formulario -->
+        <div class="form-options">
+          <div class="checkbox">
+            <input 
+              type="checkbox" 
+              id="remember-me"
+              [(ngModel)]="rememberMe" 
+              name="rememberMe" 
+              [disabled]="loading"
+              aria-describedby="remember-me-label">
+            <label for="remember-me" id="remember-me-label">Recordarme</label>
+          </div>
+          <a 
+            href="#" 
+            class="forgot-link"
+            (click)="onForgotPassword($event)">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+
+        <!-- ⭐ Botón Principal Accesible -->
         <button 
           type="submit" 
           class="btn btn-primary btn-block"
-          [disabled]="loading"
-          [class.loading]="loading">
-          <span class="spinner" *ngIf="loading"></span>
+          [disabled]="loading || !isFormValid()"
+          [class.loading]="loading"
+          [attr.aria-busy]="loading"
+          aria-live="polite">
+          <span class="spinner" *ngIf="loading" aria-hidden="true"></span>
           <span *ngIf="!loading">Iniciar Sesión</span>
-          <span *ngIf="loading">Iniciando sesión...</span>
+          <span *ngIf="loading">Iniciando sesión<span class="visually-hidden">, por favor espere</span>...</span>
         </button>
 
-        <div class="divider">
+        <!-- Divider -->
+        <div class="divider" role="separator" aria-label="O continúa con">
           <span>o continúa con</span>
         </div>
 
-        <!-- ⭐ Botones Sociales con Loading -->
-        <div class="social-buttons">
+        <!-- ⭐ Botones Sociales Accesibles -->
+        <div class="social-buttons" role="group" aria-label="Opciones de inicio de sesión con redes sociales">
           <button 
             type="button" 
             class="btn btn-social btn-google" 
             (click)="onGoogleLogin()"
             [disabled]="loading"
-            [class.loading]="loading">
-            <span class="spinner" *ngIf="loading"></span>
-            <i class="icon-google" *ngIf="!loading"></i>
+            [class.loading]="loading"
+            aria-label="Iniciar sesión con Google"
+            [attr.aria-busy]="loading">
+            <span class="spinner" *ngIf="loading" aria-hidden="true"></span>
+            <span class="icon-google" *ngIf="!loading" aria-hidden="true"></span>
             <span *ngIf="!loading">Google</span>
           </button>
           <button 
@@ -96,42 +193,45 @@
             class="btn btn-social btn-microsoft" 
             (click)="onMicrosoftLogin()"
             [disabled]="loading"
-            [class.loading]="loading">
-            <span class="spinner" *ngIf="loading"></span>
-            <i class="icon-microsoft" *ngIf="!loading"></i>
+            [class.loading]="loading"
+            aria-label="Iniciar sesión con Microsoft"
+            [attr.aria-busy]="loading">
+            <span class="spinner" *ngIf="loading" aria-hidden="true"></span>
+            <span class="icon-microsoft" *ngIf="!loading" aria-hidden="true"></span>
             <span *ngIf="!loading">Microsoft</span>
           </button>
         </div>
 
-        <div class="register-link">
+        <!-- Enlace a registro -->
+        <p class="register-link">
           ¿No tienes cuenta? 
           <a routerLink="/registro">Regístrate aquí</a>
-        </div>
+        </p>
       </form>
-    </div>
+    </main>
 
     <!-- Imagen decorativa -->
-    <div class="login-image">
+    <aside class="login-image" aria-label="Beneficios de la plataforma">
       <div class="image-content">
         <h2>Gestiona tus eventos académicos</h2>
         <p>Únete a más de 10,000 estudiantes y universidades que ya confían en UniEventos</p>
         
-        <div class="features">
-          <div class="feature">
-            <i class="feature-icon">✓</i>
+        <ul class="features" role="list">
+          <li class="feature">
+            <span class="feature-icon" aria-hidden="true">✓</span>
             <span>Registro fácil y rápido</span>
-          </div>
-          <div class="feature">
-            <i class="feature-icon">✓</i>
+          </li>
+          <li class="feature">
+            <span class="feature-icon" aria-hidden="true">✓</span>
             <span>Gestión en tiempo real</span>
-          </div>
-          <div class="feature">
-            <i class="feature-icon">✓</i>
+          </li>
+          <li class="feature">
+            <span class="feature-icon" aria-hidden="true">✓</span>
             <span>Reportes automáticos</span>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
-    </div>
+    </aside>
 
   </div>
 </div>

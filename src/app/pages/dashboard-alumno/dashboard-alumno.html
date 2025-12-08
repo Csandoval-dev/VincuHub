@@ -2,12 +2,20 @@
 
 <div class="dashboard-container" *ngIf="!loading">
   
-  <!-- ========== HEADER ========== -->
+  <!-- ========== HEADER PROFESIONAL ========== -->
   <header class="dashboard-header">
     <div class="header-content">
       <div class="header-left">
-        <h1>🎓 Dashboard Estudiante</h1>
-        <p class="header-subtitle">Gestiona tus eventos y horas de vinculación</p>
+        <div class="header-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke-width="2"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke-width="2"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Panel de Estudiante</h1>
+          <p class="header-subtitle">Gestión de eventos y horas de vinculación</p>
+        </div>
       </div>
       <div class="header-right">
         <div class="user-info">
@@ -20,12 +28,12 @@
           </div>
         </div>
         <button (click)="logout()" class="btn-logout">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-width="2"/>
-            <polyline points="16 17 21 12 16 7" stroke-width="2"/>
-            <line x1="21" y1="12" x2="9" y2="12" stroke-width="2"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-width="2" stroke-linecap="round"/>
+            <polyline points="16 17 21 12 16 7" stroke-width="2" stroke-linecap="round"/>
+            <line x1="21" y1="12" x2="9" y2="12" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Salir
+          <span>Cerrar Sesión</span>
         </button>
       </div>
     </div>
@@ -37,120 +45,190 @@
     <!-- Welcome Section -->
     <div class="welcome-section">
       <div class="welcome-content">
-        <h2>¡Bienvenido, {{ currentUser?.nombre }}! 👋</h2>
-        <p class="campus-info">
-          <strong>Campus:</strong> {{ currentUser?.campus || 'No especificado' }}
-        </p>
+        <h2>Bienvenido, {{ currentUser?.nombre }}</h2>
+        <div class="welcome-meta">
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-width="2"/>
+              <circle cx="12" cy="7" r="4" stroke-width="2"/>
+            </svg>
+            Estudiante
+          </span>
+          <span class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+              <circle cx="12" cy="10" r="3" stroke-width="2"/>
+            </svg>
+            {{ currentUser?.campus || 'No especificado' }}
+          </span>
+        </div>
       </div>
     </div>
 
-    <!-- ========== STATS CARDS ========== -->
+    <!-- ========== STATS CARDS PROFESIONALES ========== -->
     <div class="stats-grid">
       <div class="stat-card stat-primary">
-        <div class="stat-icon">⏱️</div>
-        <div class="stat-content">
-          <h3>Horas de Vinculación</h3>
-          <p class="stat-number">{{ stats.horasTotales }}</p>
-          <span class="stat-label">horas completadas</span>
+        <div class="stat-header">
+          <div class="stat-icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="2"/>
+              <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Horas de Vinculación</span>
+            <h3 class="stat-value">{{ stats.horasTotales }}<span class="stat-unit">h</span></h3>
+          </div>
         </div>
         <div class="stat-progress">
           <div class="progress-bar">
             <div class="progress-fill" [style.width.%]="(stats.horasTotales / 60) * 100"></div>
           </div>
-          <span class="progress-text">{{ stats.horasTotales }} / 60 horas requeridas</span>
+          <div class="progress-labels">
+            <span class="progress-text">{{ stats.horasTotales }} de 70 horas completadas</span>
+            <span class="progress-percentage">{{ ((stats.horasTotales / 70) * 100).toFixed(0) }}%</span>
+          </div>
         </div>
       </div>
 
       <div class="stat-card stat-success">
-        <div class="stat-icon">📅</div>
-        <div class="stat-content">
-          <h3>Eventos Inscritos</h3>
-          <p class="stat-number">{{ stats.eventosInscritos }}</p>
-          <span class="stat-label">eventos activos</span>
+        <div class="stat-header">
+          <div class="stat-icon-wrapper stat-icon-success">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+              <line x1="16" y1="2" x2="16" y2="6" stroke-width="2" stroke-linecap="round"/>
+              <line x1="8" y1="2" x2="8" y2="6" stroke-width="2" stroke-linecap="round"/>
+              <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Eventos Activos</span>
+            <h3 class="stat-value">{{ stats.eventosInscritos }}</h3>
+          </div>
         </div>
+        <p class="stat-description">Eventos en los que estás inscrito actualmente</p>
       </div>
 
       <div class="stat-card stat-info">
-        <div class="stat-icon">✅</div>
-        <div class="stat-content">
-          <h3>Eventos Completados</h3>
-          <p class="stat-number">{{ stats.eventosCompletados }}</p>
-          <span class="stat-label">este semestre</span>
+        <div class="stat-header">
+          <div class="stat-icon-wrapper stat-icon-info">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Eventos Completados</span>
+            <h3 class="stat-value">{{ stats.eventosCompletados }}</h3>
+          </div>
         </div>
+        <p class="stat-description">Total de eventos finalizados este semestre</p>
       </div>
     </div>
 
-    <!-- ========== NAVIGATION TABS ========== -->
-    <div class="nav-tabs">
-      <button 
-        class="tab-button"
-        [class.active]="vistaActiva === 'eventos'"
-        (click)="cambiarVista('eventos')">
-        📅 Eventos Disponibles
-      </button>
-      <button 
-        class="tab-button"
-        [class.active]="vistaActiva === 'inscripciones'"
-        (click)="cambiarVista('inscripciones')">
-        📝 Mis Inscripciones
-      </button>
-      <button 
-        class="tab-button"
-        [class.active]="vistaActiva === 'historial'"
-        (click)="cambiarVista('historial')">
-        📊 Mi Historial
-      </button>
+    <!-- ========== NAVIGATION TABS PROFESIONAL ========== -->
+    <div class="nav-container">
+      <nav class="nav-tabs">
+        <button 
+          class="tab-button"
+          [class.active]="vistaActiva === 'eventos'"
+          (click)="cambiarVista('eventos')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+          </svg>
+          <span>Eventos Disponibles</span>
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="vistaActiva === 'inscripciones'"
+          (click)="cambiarVista('inscripciones')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2"/>
+            <polyline points="14 2 14 8 20 8" stroke-width="2"/>
+            <line x1="12" y1="18" x2="12" y2="12" stroke-width="2"/>
+            <line x1="9" y1="15" x2="15" y2="15" stroke-width="2"/>
+          </svg>
+          <span>Mis Inscripciones</span>
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="vistaActiva === 'historial'"
+          (click)="cambiarVista('historial')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-width="2"/>
+          </svg>
+          <span>Mi Historial</span>
+        </button>
+      </nav>
     </div>
 
     <!-- ========== VISTA: EVENTOS DISPONIBLES ========== -->
     <div *ngIf="vistaActiva === 'eventos'" class="content-section">
       
-      <!-- Filtros -->
+      <!-- Filtros Profesionales -->
       <div class="filters-section">
         <div class="search-box">
           <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
           <input 
             type="text" 
             [(ngModel)]="searchTerm"
             (input)="filtrarEventos()"
-            placeholder="Buscar eventos..."
+            placeholder="Buscar por título, descripción..."
             class="search-input">
         </div>
 
         <div class="filter-group">
-          <select [(ngModel)]="filtroTipo" (change)="filtrarEventos()" class="filter-select">
-            <option value="">Todos los tipos</option>
-            <option value="feria">Feria</option>
-            <option value="voluntariado">Voluntariado</option>
-            <option value="conferencia">Conferencia</option>
-            <option value="taller">Taller</option>
-          </select>
+          <div class="filter-wrapper">
+            <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <select [(ngModel)]="filtroTipo" (change)="filtrarEventos()" class="filter-select">
+              <option value="">Todos los tipos</option>
+              <option value="feria">Feria</option>
+              <option value="voluntariado">Voluntariado</option>
+              <option value="conferencia">Conferencia</option>
+              <option value="taller">Taller</option>
+            </select>
+          </div>
 
-          <select [(ngModel)]="filtroCampus" (change)="filtrarEventos()" class="filter-select">
-            <option value="">Todos los campus</option>
-            <option value="San Pedro Sula">San Pedro Sula</option>
-            <option value="Tegucigalpa">Tegucigalpa</option>
-            <option value="La Ceiba">La Ceiba</option>
-          </select>
+          <div class="filter-wrapper">
+            <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+              <circle cx="12" cy="10" r="3" stroke-width="2"/>
+            </svg>
+            <select [(ngModel)]="filtroCampus" (change)="filtrarEventos()" class="filter-select">
+              <option value="">Todos los campus</option>
+              <option value="San Pedro Sula">San Pedro Sula</option>
+              <option value="Tegucigalpa">Tegucigalpa</option>
+              <option value="La Ceiba">La Ceiba</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <!-- Loading Eventos -->
       <div *ngIf="loadingEventos" class="loading-state">
         <div class="spinner"></div>
-        <p>Cargando eventos...</p>
+        <p>Cargando eventos disponibles...</p>
       </div>
 
       <!-- Sin eventos -->
       <div *ngIf="!loadingEventos && eventosFiltrados.length === 0" class="empty-state">
-        <div class="empty-icon">📅</div>
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+          <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+          <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+          <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+        </svg>
         <h3>No hay eventos disponibles</h3>
-        <p>Vuelve pronto para ver nuevos eventos</p>
+        <p>No se encontraron eventos que coincidan con tu búsqueda</p>
       </div>
 
-      <!-- Grid de eventos -->
+      <!-- Grid de eventos PROFESIONAL -->
       <div *ngIf="!loadingEventos && eventosFiltrados.length > 0" class="eventos-grid">
         <div *ngFor="let evento of eventosFiltrados" class="evento-card">
           <div class="evento-imagen">
@@ -162,16 +240,19 @@
                 <polyline points="21 15 16 10 5 21" stroke-width="2"/>
               </svg>
             </div>
-            <span class="evento-tipo-badge">{{ getTipoLabel(evento.tipo) }}</span>
+            <div class="evento-badges">
+              <span class="evento-tipo-badge">{{ getTipoLabel(evento.tipo) }}</span>
+              <span *ngIf="estaInscritoEnEvento(evento.eventoId!)" class="badge-inscrito-mini">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="20 6 9 17 4 12" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+                Inscrito
+              </span>
+            </div>
           </div>
 
           <div class="evento-content">
             <h3 class="evento-titulo">{{ evento.titulo }}</h3>
-            
-            <!-- ✅ NUEVO: Badge de estado inscrito -->
-            <div *ngIf="estaInscritoEnEvento(evento.eventoId!)" class="badge-inscrito">
-              ✅ Inscrito
-            </div>
             
             <p class="evento-descripcion">{{ evento.descripcion }}</p>
 
@@ -202,39 +283,52 @@
                 <span>{{ evento.ubicacion }}</span>
               </div>
 
-              <div class="detalle-item">
+              <div class="detalle-item" [class.detalle-warning]="estaEventoLleno(evento)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/>
                   <circle cx="9" cy="7" r="4" stroke-width="2"/>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/>
                   <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2"/>
                 </svg>
-                <span>{{ evento.inscritosCount || 0 }} / {{ evento.cupo }} inscritos</span>
+                <span>{{ evento.inscritosCount || 0 }} / {{ evento.cupo }}</span>
               </div>
             </div>
 
-            <!-- ✅ ACTUALIZADO: Botones con estado -->
             <div class="evento-actions">
               <button 
-                class="btn-ver-detalles"
+                class="btn-secondary-outline"
                 (click)="verDetallesEvento(evento)">
-                👁️ Ver Detalles
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="3" stroke-width="2"/>
+                </svg>
+                <span>Ver Detalles</span>
               </button>
               
               <button 
                 *ngIf="!estaInscritoEnEvento(evento.eventoId!)"
-                class="btn-inscribirse"
+                class="btn-primary"
                 (click)="abrirModalInscripcion(evento)"
                 [disabled]="debeDeshabilitarBoton(evento)">
-                {{ getTextoBotonInscripcion(evento) }}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/>
+                  <circle cx="8.5" cy="7" r="4" stroke-width="2"/>
+                  <line x1="20" y1="8" x2="20" y2="14" stroke-width="2"/>
+                  <line x1="23" y1="11" x2="17" y2="11" stroke-width="2"/>
+                </svg>
+                <span>{{ getTextoBotonInscripcion(evento) }}</span>
               </button>
 
               <button 
                 *ngIf="estaInscritoEnEvento(evento.eventoId!)"
-                class="btn-cancelar"
+                class="btn-danger-outline"
                 (click)="cancelarInscripcion(evento.eventoId!)"
                 [disabled]="cancelandoInscripcion">
-                {{ cancelandoInscripcion ? 'Cancelando...' : '🗑️ Cancelar Inscripción' }}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
+                  <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
+                </svg>
+                <span>{{ cancelandoInscripcion ? 'Cancelando...' : 'Cancelar' }}</span>
               </button>
             </div>
           </div>
@@ -247,38 +341,95 @@
       
       <div *ngIf="loadingInscripciones" class="loading-state">
         <div class="spinner"></div>
-        <p>Cargando inscripciones...</p>
+        <p>Cargando tus inscripciones...</p>
       </div>
 
-      <!-- Eventos Inscritos -->
       <div *ngIf="!loadingInscripciones">
-        <h3 class="section-title">📅 Eventos Inscritos ({{ eventosInscritos.length }})</h3>
-
-        <div *ngIf="eventosInscritos.length === 0" class="empty-state">
-          <div class="empty-icon">📝</div>
-          <h3>No tienes eventos inscritos</h3>
-          <p>Explora los eventos disponibles y regístrate</p>
+        <div class="section-header-inline">
+          <h3 class="section-title">Eventos Activos</h3>
+          <span class="count-badge">{{ eventosInscritos.length }}</span>
         </div>
 
-        <div class="eventos-list">
-          <div *ngFor="let evento of eventosInscritos" class="evento-list-item">
+        <div *ngIf="eventosInscritos.length === 0" class="empty-state">
+          <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2"/>
+            <polyline points="14 2 14 8 20 8" stroke-width="2"/>
+          </svg>
+          <h3>No tienes inscripciones activas</h3>
+          <p>Explora los eventos disponibles y únete a los que te interesen</p>
+          <button class="btn-primary" style="margin-top: 1.5rem;" (click)="cambiarVista('eventos')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+              <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+              <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+              <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+            </svg>
+            <span>Ver Eventos</span>
+          </button>
+        </div>
+
+        <div class="eventos-list" *ngIf="eventosInscritos.length > 0">
+          <div *ngFor="let evento of eventosInscritos" class="evento-list-card">
             <div class="evento-list-imagen">
               <img *ngIf="evento.imagenUrl" [src]="evento.imagenUrl" [alt]="evento.titulo">
-              <div *ngIf="!evento.imagenUrl" class="imagen-placeholder-small">
-                📅
+              <div *ngIf="!evento.imagenUrl" class="imagen-placeholder-list">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+                  <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+                  <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+                </svg>
+              </div>
+              <span class="status-badge status-active">Activo</span>
+            </div>
+
+            <div class="evento-list-content">
+              <div class="evento-list-header">
+                <h4>{{ evento.titulo }}</h4>
+                <span class="tipo-tag">{{ getTipoLabel(evento.tipo) }}</span>
+              </div>
+
+              <div class="evento-list-meta">
+                <div class="meta-item">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+                    <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+                    <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+                  </svg>
+                  <span>{{ formatDate(evento.fecha) }}</span>
+                </div>
+                <div class="meta-item">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                    <polyline points="12 6 12 12 16 14" stroke-width="2"/>
+                  </svg>
+                  <span>{{ evento.horaInicio }}</span>
+                </div>
+                <div class="meta-item">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+                    <circle cx="12" cy="10" r="3" stroke-width="2"/>
+                  </svg>
+                  <span>{{ evento.ubicacion }}</span>
+                </div>
               </div>
             </div>
 
-            <div class="evento-list-info">
-              <h4>{{ evento.titulo }}</h4>
-              <p class="evento-fecha">{{ formatDate(evento.fecha) }} - {{ evento.horaInicio }}</p>
-              <p class="evento-ubicacion">📍 {{ evento.ubicacion }}</p>
-              <span class="estado-badge estado-inscrito">✅ Inscrito</span>
-            </div>
-
             <div class="evento-list-actions">
-              <button class="btn-foro" (click)="abrirForo(evento)">
-                💬 Ver Foro
+              <button class="btn-icon-action" (click)="abrirForo(evento)" title="Ver Foro">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-width="2"/>
+                </svg>
+                <span>Foro</span>
+              </button>
+              <button class="btn-icon-action" (click)="verDetallesEvento(evento)" title="Ver Detalles">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                  <line x1="12" y1="16" x2="12" y2="12" stroke-width="2"/>
+                  <line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2"/>
+                </svg>
+                <span>Detalles</span>
               </button>
             </div>
           </div>
@@ -289,33 +440,76 @@
     <!-- ========== VISTA: HISTORIAL ========== -->
     <div *ngIf="vistaActiva === 'historial'" class="content-section">
       
-      <h3 class="section-title">📊 Eventos Completados ({{ eventosCompletados.length }})</h3>
-
-      <div *ngIf="eventosCompletados.length === 0" class="empty-state">
-        <div class="empty-icon">📊</div>
-        <h3>Sin historial aún</h3>
-        <p>Aquí aparecerán los eventos que hayas completado</p>
+      <div class="section-header-inline">
+        <h3 class="section-title">Eventos Completados</h3>
+        <span class="count-badge">{{ eventosCompletados.length }}</span>
       </div>
 
-      <div class="eventos-list">
-        <div *ngFor="let evento of eventosCompletados" class="evento-list-item">
+      <div *ngIf="eventosCompletados.length === 0" class="empty-state">
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-width="2"/>
+        </svg>
+        <h3>Sin historial de eventos</h3>
+        <p>Aquí aparecerán los eventos que hayas completado y las horas certificadas</p>
+      </div>
+
+      <div class="eventos-list" *ngIf="eventosCompletados.length > 0">
+        <div *ngFor="let evento of eventosCompletados" class="evento-list-card evento-completado">
           <div class="evento-list-imagen">
             <img *ngIf="evento.imagenUrl" [src]="evento.imagenUrl" [alt]="evento.titulo">
-            <div *ngIf="!evento.imagenUrl" class="imagen-placeholder-small">
-              ✅
+            <div *ngIf="!evento.imagenUrl" class="imagen-placeholder-list">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12" stroke-width="2"/>
+              </svg>
+            </div>
+            <span class="status-badge status-completed">Completado</span>
+          </div>
+
+          <div class="evento-list-content">
+            <div class="evento-list-header">
+              <h4>{{ evento.titulo }}</h4>
+              <span class="tipo-tag">{{ getTipoLabel(evento.tipo) }}</span>
+            </div>
+
+            <div class="evento-list-meta">
+              <div class="meta-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+                  <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+                  <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+                </svg>
+                <span>{{ formatDate(evento.fecha) }}</span>
+              </div>
+              <div class="meta-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+                  <circle cx="12" cy="10" r="3" stroke-width="2"/>
+                </svg>
+                <span>{{ evento.ubicacion }}</span>
+              </div>
+            </div>
+
+            <div class="horas-certificadas">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="2"/>
+                <polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/>
+              </svg>
+              <span class="horas-text">
+                <strong>{{ getInscripcionByEvento(evento.eventoId!)?.horasGanadas || 0 }}</strong> horas certificadas
+              </span>
             </div>
           </div>
 
-          <div class="evento-list-info">
-            <h4>{{ evento.titulo }}</h4>
-            <p class="evento-fecha">{{ formatDate(evento.fecha) }}</p>
-            <p class="evento-ubicacion">📍 {{ evento.ubicacion }}</p>
-            
-            <div class="horas-info">
-              <span class="horas-badge">
-                {{ getInscripcionByEvento(evento.eventoId!)?.horasGanadas || 0 }} horas certificadas
-              </span>
-            </div>
+          <div class="evento-list-actions">
+            <button class="btn-icon-action" (click)="verDetallesEvento(evento)" title="Ver Detalles">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                <line x1="12" y1="16" x2="12" y2="12" stroke-width="2"/>
+                <line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2"/>
+              </svg>
+              <span>Ver</span>
+            </button>
           </div>
         </div>
       </div>
@@ -327,148 +521,230 @@
 <!-- ========== LOADING GENERAL ========== -->
 <div *ngIf="loading" class="loading-overlay">
   <div class="spinner-large"></div>
-  <p>Cargando dashboard...</p>
+  <p>Cargando panel de control...</p>
 </div>
 
-<!-- ========== MODAL: DETALLES DEL EVENTO ========== -->
+<!-- ========== MODALES PROFESIONALES ========== -->
+
+<!-- MODAL: DETALLES DEL EVENTO -->
 <div *ngIf="modalDetalleAbierto" class="modal-overlay" (click)="cerrarModalDetalle()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>📋 Detalles del Evento</h2>
-      <button class="btn-close" (click)="cerrarModalDetalle()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
-          <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
-        </svg>
-      </button>
-    </div>
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="cerrarModalDetalle()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
+        <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
+      </svg>
+    </button>
 
     <div class="modal-body" *ngIf="eventoDetalleAbierto">
-      <div *ngIf="eventoDetalleAbierto.imagenUrl" class="modal-imagen-grande">
+      <div *ngIf="eventoDetalleAbierto.imagenUrl" class="modal-hero-image">
         <img [src]="eventoDetalleAbierto.imagenUrl" [alt]="eventoDetalleAbierto.titulo">
-      </div>
-
-      <div class="evento-detalle-modal">
-        <h3>{{ eventoDetalleAbierto.titulo }}</h3>
-        
-        <!-- Badge de estado -->
-        <div class="badges-container">
-          <span class="badge badge-tipo">{{ getTipoLabel(eventoDetalleAbierto.tipo) }}</span>
-          <span *ngIf="estaInscritoEnEvento(eventoDetalleAbierto.eventoId!)" class="badge badge-inscrito">
-            ✅ Ya estás inscrito
-          </span>
-        </div>
-
-        <p class="modal-descripcion">{{ eventoDetalleAbierto.descripcion }}</p>
-
-        <div class="modal-detalles">
-          <div class="modal-detalle-item">
-            <strong>📅 Fecha:</strong>
-            <span>{{ formatDate(eventoDetalleAbierto.fecha) }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>⏰ Horario:</strong>
-            <span>{{ eventoDetalleAbierto.horaInicio }} - {{ eventoDetalleAbierto.horaFin }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>📍 Ubicación:</strong>
-            <span>{{ eventoDetalleAbierto.ubicacion }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>🏢 Campus:</strong>
-            <span>{{ eventoDetalleAbierto.campus }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>🎓 Facultad:</strong>
-            <span>{{ eventoDetalleAbierto.facultad }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>👥 Cupo:</strong>
-            <span>{{ eventoDetalleAbierto.inscritosCount || 0 }} / {{ eventoDetalleAbierto.cupo }} personas</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>👤 Organizador:</strong>
-            <span>{{ eventoDetalleAbierto.creadorNombre || 'No especificado' }}</span>
-          </div>
+        <div class="hero-overlay">
+          <span class="hero-badge">{{ getTipoLabel(eventoDetalleAbierto.tipo) }}</span>
         </div>
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="cerrarModalDetalle()">
-        Cerrar
-      </button>
-      <button 
-        *ngIf="!estaInscritoEnEvento(eventoDetalleAbierto!.eventoId!)"
-        class="btn-primary" 
-        (click)="cerrarModalDetalle(); abrirModalInscripcion(eventoDetalleAbierto!)"
-        [disabled]="estaEventoLleno(eventoDetalleAbierto!)">
-        {{ estaEventoLleno(eventoDetalleAbierto!) ? '🚫 Cupo Lleno' : '✅ Inscribirse Ahora' }}
-      </button>
+      <div class="modal-content-wrapper">
+        <div class="modal-title-section">
+          <h2>{{ eventoDetalleAbierto.titulo }}</h2>
+          <div class="title-badges">
+            <span *ngIf="estaInscritoEnEvento(eventoDetalleAbierto.eventoId!)" class="badge-success">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12" stroke-width="3"/>
+              </svg>
+              Ya inscrito
+            </span>
+          </div>
+        </div>
+
+        <p class="modal-description">{{ eventoDetalleAbierto.descripcion }}</p>
+
+        <div class="modal-info-grid">
+          <div class="info-card">
+            <div class="info-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+                <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+                <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+                <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <span class="info-label">Fecha</span>
+              <span class="info-value">{{ formatDate(eventoDetalleAbierto.fecha) }}</span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                <polyline points="12 6 12 12 16 14" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <span class="info-label">Horario</span>
+              <span class="info-value">{{ eventoDetalleAbierto.horaInicio }} - {{ eventoDetalleAbierto.horaFin }}</span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+                <circle cx="12" cy="10" r="3" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <span class="info-label">Ubicación</span>
+              <span class="info-value">{{ eventoDetalleAbierto.ubicacion }}</span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <span class="info-label">Campus</span>
+              <span class="info-value">{{ eventoDetalleAbierto.campus }}</span>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke-width="2"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <span class="info-label">Facultad</span>
+              <span class="info-value">{{ eventoDetalleAbierto.facultad }}</span>
+            </div>
+          </div>
+
+          <div class="info-card" [class.info-warning]="estaEventoLleno(eventoDetalleAbierto)">
+            <div class="info-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/>
+                <circle cx="9" cy="7" r="4" stroke-width="2"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-width="2"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <span class="info-label">Disponibilidad</span>
+              <span class="info-value">{{ eventoDetalleAbierto.inscritosCount || 0 }} / {{ eventoDetalleAbierto.cupo }} personas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button class="btn-secondary-outline" (click)="cerrarModalDetalle()">
+            <span>Cerrar</span>
+          </button>
+          <button 
+            *ngIf="!estaInscritoEnEvento(eventoDetalleAbierto!.eventoId!)"
+            class="btn-primary" 
+            (click)="cerrarModalDetalle(); abrirModalInscripcion(eventoDetalleAbierto!)"
+            [disabled]="estaEventoLleno(eventoDetalleAbierto!)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-width="2"/>
+              <circle cx="8.5" cy="7" r="4" stroke-width="2"/>
+              <line x1="20" y1="8" x2="20" y2="14" stroke-width="2"/>
+              <line x1="23" y1="11" x2="17" y2="11" stroke-width="2"/>
+            </svg>
+            <span>{{ estaEventoLleno(eventoDetalleAbierto!) ? 'Cupo Lleno' : 'Inscribirse' }}</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========== MODAL: INSCRIPCIÓN ========== -->
+<!-- MODAL: INSCRIPCIÓN -->
 <div *ngIf="modalInscripcionAbierto" class="modal-overlay" (click)="cerrarModalInscripcion()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Confirmar Inscripción</h2>
-      <button class="btn-close" (click)="cerrarModalInscripcion()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
-          <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
-        </svg>
-      </button>
-    </div>
+    <button class="modal-close" (click)="cerrarModalInscripcion()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
+        <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
+      </svg>
+    </button>
 
     <div class="modal-body" *ngIf="eventoSeleccionado">
-      <div class="evento-detalle-modal">
-        <h3>{{ eventoSeleccionado.titulo }}</h3>
-        <p class="modal-descripcion">{{ eventoSeleccionado.descripcion }}</p>
-
-        <div class="modal-detalles">
-          <div class="modal-detalle-item">
-            <strong>📅 Fecha:</strong>
-            <span>{{ formatDate(eventoSeleccionado.fecha) }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>⏰ Horario:</strong>
-            <span>{{ eventoSeleccionado.horaInicio }} - {{ eventoSeleccionado.horaFin }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>📍 Ubicación:</strong>
-            <span>{{ eventoSeleccionado.ubicacion }}</span>
-          </div>
-          <div class="modal-detalle-item">
-            <strong>🏢 Campus:</strong>
-            <span>{{ eventoSeleccionado.campus }}</span>
-          </div>
+      <div class="modal-icon-header">
+        <div class="modal-icon-wrapper">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="2"/>
+            <polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/>
+          </svg>
         </div>
+        <h2>Confirmar Inscripción</h2>
+        <p class="modal-subtitle">Revisa los detalles antes de confirmar</p>
+      </div>
 
-        <div class="modal-warning">
-          ⚠️ Al inscribirte, te comprometes a asistir al evento. Se tomarán asistencia y se certificarán las horas de vinculación.
+      <div class="confirmation-card">
+        <h4>{{ eventoSeleccionado.titulo }}</h4>
+        <div class="confirmation-details">
+          <div class="detail-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+              <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+              <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+              <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+            </svg>
+            <span>{{ formatDate(eventoSeleccionado.fecha) }} • {{ eventoSeleccionado.horaInicio }} - {{ eventoSeleccionado.horaFin }}</span>
+          </div>
+          <div class="detail-row">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-width="2"/>
+              <circle cx="12" cy="10" r="3" stroke-width="2"/>
+            </svg>
+            <span>{{ eventoSeleccionado.ubicacion }}, {{ eventoSeleccionado.campus }}</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="cerrarModalInscripcion()" [disabled]="inscribiendo">
-        Cancelar
-      </button>
-      <button class="btn-primary" (click)="confirmarInscripcion()" [disabled]="inscribiendo">
-        {{ inscribiendo ? 'Inscribiendo...' : '✅ Confirmar Inscripción' }}
-      </button>
+      <div class="warning-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" stroke-width="2"/>
+          <line x1="12" y1="8" x2="12" y2="12" stroke-width="2"/>
+          <line x1="12" y1="16" x2="12.01" y2="16" stroke-width="2"/>
+        </svg>
+        <div>
+          <strong>Compromiso de asistencia</strong>
+          <p>Al inscribirte, te comprometes a asistir puntualmente. Se registrará tu asistencia y se certificarán las horas de vinculación correspondientes.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-secondary-outline" (click)="cerrarModalInscripcion()" [disabled]="inscribiendo">
+          <span>Cancelar</span>
+        </button>
+        <button class="btn-primary" (click)="confirmarInscripcion()" [disabled]="inscribiendo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="20 6 9 17 4 12" stroke-width="2"/>
+          </svg>
+          <span>{{ inscribiendo ? 'Inscribiendo...' : 'Confirmar' }}</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========== MODAL: FORO ========== -->
+<!-- MODAL: FORO -->
 <div *ngIf="modalForoAbierto" class="modal-overlay" (click)="cerrarModalForo()">
-  <div class="modal-content modal-foro" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>💬 Foro: {{ eventoForoSeleccionado?.titulo }}</h2>
-      <button class="btn-close" (click)="cerrarModalForo()">
+  <div class="modal-content modal-large modal-foro" (click)="$event.stopPropagation()">
+    <div class="modal-header-foro">
+      <div>
+        <h2>Foro de Discusión</h2>
+        <p class="modal-subtitle">{{ eventoForoSeleccionado?.titulo }}</p>
+      </div>
+      <button class="modal-close" (click)="cerrarModalForo()">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <line x1="18" y1="6" x2="6" y2="18" stroke-width="2"/>
           <line x1="6" y1="6" x2="18" y2="18" stroke-width="2"/>
@@ -476,46 +752,58 @@
       </button>
     </div>
 
-    <div class="modal-body modal-body-foro">
-      <!-- Mensajes -->
-      <div class="mensajes-container">
+    <div class="foro-container">
+      <div class="mensajes-list">
         <div *ngIf="mensajesForo.length === 0" class="empty-mensajes">
-          <p>No hay mensajes aún. Sé el primero en comentar.</p>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-width="2"/>
+          </svg>
+          <p>No hay mensajes aún</p>
+          <span>Sé el primero en comentar</span>
         </div>
 
-        <div *ngFor="let mensaje of mensajesForo" class="mensaje-item">
-          <div class="mensaje-avatar">
+        <div *ngFor="let mensaje of mensajesForo" class="mensaje-bubble">
+          <div class="mensaje-avatar-pro">
             {{ getInitials(mensaje.nombreUsuario || '') }}
           </div>
-          <div class="mensaje-content">
-            <div class="mensaje-header">
-              <span class="mensaje-autor">{{ mensaje.nombreUsuario }}</span>
-              <span class="mensaje-rol">{{ getRolLabel(mensaje.rolUsuario || '') }}</span>
-              <span class="mensaje-fecha">{{ mensaje.fecha | date: 'short' }}</span>
+          <div class="mensaje-content-pro">
+            <div class="mensaje-header-pro">
+              <span class="mensaje-author">{{ mensaje.nombreUsuario }}</span>
+              <span class="mensaje-role-badge">{{ getRolLabel(mensaje.rolUsuario || '') }}</span>
+              <span class="mensaje-timestamp">{{ mensaje.fecha | date: 'short' }}</span>
             </div>
-            <p class="mensaje-texto">{{ mensaje.contenido }}</p>
+            <p class="mensaje-text">{{ mensaje.contenido }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Formulario -->
-      <div class="mensaje-form" *ngIf="!foroActivo?.cerrado">
-        <textarea
-          [(ngModel)]="nuevoMensaje"
-          placeholder="Escribe tu comentario..."
-          rows="3"
-          class="mensaje-textarea"
-          [disabled]="enviandoMensaje"></textarea>
-        <button 
-          class="btn-enviar-mensaje"
-          (click)="enviarMensajeForo()"
-          [disabled]="!nuevoMensaje.trim() || enviandoMensaje">
-          {{ enviandoMensaje ? 'Enviando...' : '📤 Enviar' }}
-        </button>
+      <div class="mensaje-input-section" *ngIf="!foroActivo?.cerrado">
+        <div class="input-container">
+          <textarea
+            [(ngModel)]="nuevoMensaje"
+            placeholder="Escribe tu mensaje..."
+            rows="3"
+            class="mensaje-input"
+            [disabled]="enviandoMensaje"></textarea>
+          <button 
+            class="btn-send-mensaje"
+            (click)="enviarMensajeForo()"
+            [disabled]="!nuevoMensaje.trim() || enviandoMensaje">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="22" y1="2" x2="11" y2="13" stroke-width="2"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2" stroke-width="2"/>
+            </svg>
+            <span>{{ enviandoMensaje ? 'Enviando...' : 'Enviar' }}</span>
+          </button>
+        </div>
       </div>
 
-      <div *ngIf="foroActivo?.cerrado" class="foro-cerrado">
-        🔒 Este foro ha sido cerrado
+      <div *ngIf="foroActivo?.cerrado" class="foro-closed-notice">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-width="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-width="2"/>
+        </svg>
+        <span>Este foro ha sido cerrado por el organizador</span>
       </div>
     </div>
   </div>
